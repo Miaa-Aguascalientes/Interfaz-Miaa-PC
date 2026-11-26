@@ -7,7 +7,6 @@ from PIL import Image, ImageDraw, ImageFilter
 import streamlit as st
 import streamlit.components.v1 as components
 
-# 1. CONFIGURACIÓN DE PÁGINA (EXACTA)
 st.set_page_config(
     page_title="Interfaz Miaa",
     page_icon="https://www.miaa.mx/favicon.ico",
@@ -17,7 +16,6 @@ st.set_page_config(
 
 LOGO_URL = "https://raw.githubusercontent.com/Miaa-Aguascalientes/Logos/38504978c8f77a4dac38ad476f74dbdee6af2cad/LogoMIAA.svg"
 
-# 2. URLS DE TUS SISTEMAS (MODIFICA AQUÍ TUS ENLACES)
 SISTEMAS = [
     {
         "id": "scada",
@@ -82,7 +80,6 @@ SISTEMAS = [
 ]
 
 
-# 3. GENERADOR DE TEXTURA DE FONDO (OLAS DE AGUA + TANQUE ELEVADO) CON PILLOW
 @st.cache_data(show_spinner=False)
 def obtener_fondo_base64() -> str:
     ruta_fondo = Path("assets/fondo_miaa.jpg")
@@ -93,7 +90,6 @@ def obtener_fondo_base64() -> str:
     img = Image.new("RGB", (w, h), (3, 16, 36))
     draw = ImageDraw.Draw(img, "RGBA")
 
-    # Cielo nocturno azul profundo con iluminación detrás del tanque elevado
     for y in range(h):
         t = y / h
         r = int(4 + 14 * math.sin(t * math.pi))
@@ -101,7 +97,6 @@ def obtener_fondo_base64() -> str:
         b = int(48 + 95 * math.sin(t * math.pi))
         draw.line([(0, y), (w, y)], fill=(r, g, b, 255))
 
-    # Halo luminoso detrás del tanque elevado (arriba derecha)
     halo = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     hdraw = ImageDraw.Draw(halo)
     hdraw.ellipse((980, -60, 1460, 360), fill=(35, 145, 235, 110))
@@ -109,17 +104,18 @@ def obtener_fondo_base64() -> str:
     halo = halo.filter(ImageFilter.GaussianBlur(45))
     img.paste(halo, (0, 0), halo)
 
-    # Silueta de árboles en el horizonte derecho
     rng = random.Random(42)
     for tx in range(960, 1600, 28):
         th = rng.randint(45, 95)
         draw.ellipse((tx - 24, 240 - th, tx + 24, 265), fill=(6, 26, 48, 220))
 
-    # Tanque elevado estilo MIAA en la parte superior derecha
     cx = 1235
-    # Estructura de soporte (patas y tirantes)
-    patas = [(cx - 56, 130, cx - 68, 250), (cx - 20, 134, cx - 24, 250),
-             (cx + 20, 134, cx + 24, 250), (cx + 56, 130, cx + 68, 250)]
+    patas = [
+        (cx - 56, 130, cx - 68, 250),
+        (cx - 20, 134, cx - 24, 250),
+        (cx + 20, 134, cx + 24, 250),
+        (cx + 56, 130, cx + 68, 250)
+    ]
     for x1, y1, x2, y2 in patas:
         draw.line([(x1, y1), (x2, y2)], fill=(95, 155, 205, 210), width=5)
     for y_cross in (170, 210):
@@ -129,20 +125,16 @@ def obtener_fondo_base64() -> str:
     draw.line([(cx - 22, 170), (cx + 22, 210)], fill=(80, 140, 190, 150), width=2)
     draw.line([(cx + 22, 170), (cx - 22, 210)], fill=(80, 140, 190, 150), width=2)
 
-    # Cuerpo cilíndrico del tanque elevado con sombreado 3D
     draw.ellipse((cx - 78, 34, cx + 78, 62), fill=(115, 175, 225, 235))
     draw.rectangle((cx - 78, 48, cx + 78, 126), fill=(72, 132, 188, 235))
     draw.rectangle((cx - 78, 48, cx - 28, 126), fill=(118, 178, 228, 165))
     draw.ellipse((cx - 78, 112, cx + 78, 140), fill=(52, 106, 160, 240))
-    # Emblema gota en el tanque
     draw.polygon([(cx, 56), (cx - 10, 72), (cx + 10, 72)], fill=(12, 58, 110, 220))
     draw.ellipse((cx - 10, 66, cx + 10, 82), fill=(12, 58, 110, 220))
 
-    # Olas de agua dinámicas superiores e inferiores con brillo especular
     wave_layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     wdraw = ImageDraw.Draw(wave_layer)
 
-    # Ola superior (cresta detrás de las tarjetas superiores)
     pts_top = [(0, 270)]
     for x in range(0, w + 20, 20):
         y = 215 + 32 * math.sin(x * 0.0045) + 14 * math.cos(x * 0.011)
@@ -150,19 +142,16 @@ def obtener_fondo_base64() -> str:
     pts_top.extend([(w, 340), (0, 340)])
     wdraw.polygon(pts_top, fill=(8, 72, 148, 195))
 
-    # Filo luminoso de espuma en la ola superior
     crest_top = [(x, 215 + 32 * math.sin(x * 0.0045) + 14 * math.cos(x * 0.011)) for x in range(0, w + 10, 10)]
     wdraw.line(crest_top, fill=(140, 225, 255, 230), width=5)
     wdraw.line([(x, y + 6) for x, y in crest_top], fill=(30, 165, 255, 180), width=8)
 
-    # Gotas y salpicaduras sobre la ola superior
     for _ in range(55):
         sx = rng.randint(120, 1480)
         sy = int(175 + 32 * math.sin(sx * 0.0045) + rng.randint(-28, 18))
         sr = rng.randint(2, 6)
         wdraw.ellipse((sx - sr, sy - sr, sx + sr, sy + sr), fill=(185, 240, 255, 215))
 
-    # Ola inferior (primer plano abajo de las tarjetas)
     pts_bot = [(0, h)]
     for x in range(0, w + 20, 20):
         y = 755 + 24 * math.sin(x * 0.0052 + 1.2) + 12 * math.cos(x * 0.013)
@@ -174,8 +163,7 @@ def obtener_fondo_base64() -> str:
     wdraw.line(crest_bot, fill=(165, 235, 255, 240), width=5)
     wdraw.line([(x, y + 8) for x, y in crest_bot], fill=(25, 155, 248, 190), width=10)
 
-    # Reflejos internos del agua
-    for i in range(18):
+    for _ in range(18):
         rx = rng.randint(40, w - 180)
         ry = rng.randint(775, 845)
         rw = rng.randint(70, 190)
@@ -189,7 +177,6 @@ def obtener_fondo_base64() -> str:
     return f"data:image/jpeg;base64,{base64.b64encode(buf.getvalue()).decode('utf-8')}"
 
 
-# 4. GENERADOR DE MINIATURAS 3D DETALLADAS PARA CADA TARJETA
 @st.cache_data(show_spinner=False)
 def obtener_icono_tarjeta(sys_id: str, ruta_local: str) -> str:
     p = Path(ruta_local)
@@ -203,59 +190,47 @@ def obtener_icono_tarjeta(sys_id: str, ruta_local: str) -> str:
     img = Image.new("RGBA", (w, h), (6, 24, 48, 255))
     d = ImageDraw.Draw(img)
 
-    # Fondo con brillo radial interno
     for r in range(130, 0, -4):
         alpha = int(120 * (1 - r / 130))
         d.ellipse((w // 2 - r, h // 2 - r, w // 2 + r, h // 2 + r), fill=(18, 95, 175, alpha))
 
     if sys_id == "scada":
-        # Monitor SCADA atrás
         d.rounded_rectangle((96, 22, 254, 118), radius=10, fill=(8, 30, 58, 255), outline=(56, 189, 248, 255), width=3)
         d.line([(112, 92), (140, 62), (168, 76), (202, 42), (238, 56)], fill=(34, 211, 238, 255), width=4)
         d.ellipse((197, 37, 207, 47), fill=(255, 255, 255, 255))
-        # Motor eléctrico azul metálico
         d.rounded_rectangle((28, 96, 152, 172), radius=14, fill=(14, 116, 210, 255), outline=(125, 211, 252, 255), width=3)
         d.rectangle((36, 102, 144, 122), fill=(56, 189, 248, 170))
         for rx in range(48, 138, 18):
             d.line([(rx, 108), (rx, 160)], fill=(5, 32, 66, 255), width=4)
-        # Caracol centrífugo
         d.ellipse((142, 86, 228, 172), fill=(12, 82, 160, 255), outline=(56, 189, 248, 255), width=4)
         d.ellipse((166, 110, 204, 148), fill=(6, 26, 52, 255), outline=(186, 230, 253, 255), width=3)
         d.rectangle((172, 64, 198, 92), fill=(2, 132, 199, 255), outline=(125, 211, 252, 255), width=2)
         d.rounded_rectangle((20, 174, 244, 190), radius=4, fill=(30, 64, 135, 255))
 
     elif sys_id == "medidores":
-        # Tubería horizontal azul
         d.rectangle((16, 108, 264, 146), fill=(3, 105, 161, 255), outline=(56, 189, 248, 255), width=2)
         d.rounded_rectangle((28, 96, 52, 158), radius=4, fill=(2, 132, 199, 255), outline=(125, 211, 252, 255), width=2)
         d.rounded_rectangle((228, 96, 252, 158), radius=4, fill=(2, 132, 199, 255), outline=(125, 211, 252, 255), width=2)
-        # Ondas WiFi cian
         d.arc((102, 14, 178, 72), start=210, end=330, fill=(34, 211, 238, 255), width=5)
         d.arc((116, 28, 164, 72), start=210, end=330, fill=(34, 211, 238, 255), width=5)
-        # Cuerpo metálico del medidor inteligente
         d.ellipse((74, 58, 206, 190), fill=(203, 213, 225, 255), outline=(56, 189, 248, 255), width=5)
         d.ellipse((88, 72, 192, 176), fill=(15, 23, 42, 255), outline=(148, 163, 184, 255), width=3)
-        # Display LCD
         d.rounded_rectangle((102, 102, 178, 128), radius=4, fill=(186, 230, 253, 255))
         d.text((112, 109), "000254.7", fill=(7, 89, 133, 255))
         d.ellipse((132, 140, 148, 156), fill=(239, 68, 68, 255))
 
     elif sys_id == "gis":
-        # Mapa plegado con relieve
         d.polygon([(30, 74), (102, 52), (102, 178), (30, 200)], fill=(16, 125, 92, 255), outline=(110, 231, 183, 255))
         d.polygon([(102, 52), (176, 74), (176, 200), (102, 178)], fill=(11, 98, 74, 255), outline=(110, 231, 183, 255))
         d.polygon([(176, 74), (248, 52), (248, 178), (176, 200)], fill=(18, 142, 104, 255), outline=(110, 231, 183, 255))
-        # Red de tuberías y sectores
         d.line([(42, 132), (102, 108), (176, 138), (236, 104)], fill=(56, 189, 248, 255), width=6)
         d.line([(72, 68), (124, 132), (146, 186)], fill=(253, 224, 71, 220), width=4)
-        # Pin rojo 3D
         px, py = 176, 62
         d.polygon([(px - 32, py + 8), (px + 32, py + 8), (px, py + 66)], fill=(220, 38, 38, 255))
         d.ellipse((px - 34, py - 30, px + 34, py + 36), fill=(239, 68, 68, 255), outline=(255, 255, 255, 255), width=3)
         d.ellipse((px - 14, py - 10, px + 14, py + 18), fill=(255, 255, 255, 255))
 
     elif sys_id == "mantenimiento":
-        # Engrane metálico con dientes
         cx, cy = 126, 116
         for i in range(10):
             ang = i * (2 * math.pi / 10)
@@ -266,34 +241,35 @@ def obtener_icono_tarjeta(sys_id: str, ruta_local: str) -> str:
             d.line([(x1, y1), (x2, y2)], fill=(203, 213, 225, 255), width=16)
         d.ellipse((cx - 50, cy - 50, cx + 50, cy + 50), fill=(148, 163, 184, 255), outline=(241, 245, 249, 255), width=3)
         d.ellipse((cx - 26, cy - 26, cx + 26, cy + 26), fill=(10, 28, 54, 255), outline=(245, 158, 11, 255), width=4)
-        # Llave mecánica cruzada
         d.line([(68, 174), (206, 52)], fill=(226, 232, 240, 255), width=18)
-        d.ellipse((46, 154), (92, 198), fill=(226, 232, 240, 255))
-        d.ellipse((184, 32), (230, 76), fill=(226, 232, 240, 255))
-        d.ellipse((198, 42), (224, 66), fill=(10, 28, 54, 255))
+        d.ellipse((46, 154, 92, 198), fill=(226, 232, 240, 255))
+        d.ellipse((184, 32, 230, 76), fill=(226, 232, 240, 255))
+        d.ellipse((198, 42, 224, 66), fill=(10, 28, 54, 255))
 
     elif sys_id == "tableros":
-        # Monitor ejecutivo
         d.rounded_rectangle((30, 24, 250, 154), radius=12, fill=(10, 25, 50, 255), outline=(96, 165, 250, 255), width=4)
         d.polygon([(122, 154), (158, 154), (172, 186), (108, 186)], fill=(59, 130, 246, 255))
         d.rounded_rectangle((88, 186, 192, 196), radius=4, fill=(147, 197, 253, 255))
-        # Gráfica de barras
-        barras = [(52, 110, 138, (56, 189, 248)), (74, 88, 138, (34, 211, 238)),
-                  (96, 98, 138, (129, 140, 248)), (118, 66, 138, (167, 139, 250))]
+        barras = [
+            (52, 110, 138, (56, 189, 248)),
+            (74, 88, 138, (34, 211, 238)),
+            (96, 98, 138, (129, 140, 248)),
+            (118, 66, 138, (167, 139, 250))
+        ]
         for x1, y1, y2, col in barras:
             d.rounded_rectangle((x1, y1, x1 + 14, y2), radius=3, fill=col + (255,))
-        # Gráfica de dona
         d.ellipse((164, 62, 226, 124), outline=(30, 58, 138, 255), width=14)
         d.arc((164, 62, 226, 124), start=-90, end=145, fill=(0, 212, 255, 255), width=14)
 
     elif sys_id == "hes":
-        # Casa residencial
-        d.polygon([(118, 34), (42, 98), (58, 98), (58, 182), (178, 182), (178, 98), (194, 98)],
-                  fill=(203, 213, 225, 255), outline=(56, 189, 248, 255))
+        d.polygon(
+            [(118, 34), (42, 98), (58, 98), (58, 182), (178, 182), (178, 98), (194, 98)],
+            fill=(203, 213, 225, 255),
+            outline=(56, 189, 248, 255)
+        )
         d.polygon([(118, 24), (32, 96), (44, 108), (118, 46), (192, 108), (204, 96)], fill=(2, 132, 199, 255))
         d.rounded_rectangle((82, 120, 114, 182), radius=3, fill=(15, 23, 42, 255))
         d.rounded_rectangle((130, 114, 162, 146), radius=3, fill=(15, 23, 42, 255), outline=(56, 189, 248, 255), width=2)
-        # Señal WiFi y Gota de agua 3D
         d.arc((176, 26, 236, 74), start=210, end=330, fill=(34, 211, 238, 255), width=5)
         d.arc((188, 38, 224, 74), start=210, end=330, fill=(34, 211, 238, 255), width=5)
         gx, gy = 206, 146
@@ -310,7 +286,6 @@ FONDO_B64 = obtener_fondo_base64()
 for s in SISTEMAS:
     s["img_b64"] = obtener_icono_tarjeta(s["id"], s["archivo_local"])
 
-# 5. BARRA LATERAL NATIVA DE STREAMLIT (SIEMPRE VISIBLE Y FUNCIONAL)
 with st.sidebar:
     st.markdown(
         f'<div style="text-align:center;padding:8px 0 14px 0;border-bottom:1px solid rgba(56,189,248,0.25);">'
@@ -324,7 +299,6 @@ with st.sidebar:
     st.markdown("---")
     st.caption("Dirección de Planeación • Subdirección de Tecnología e Innovación")
 
-# 6. CONSTRUCCIÓN DE LAS TARJETAS Y EL PORTAL COMPLETO EN HTML5 PURO
 tarjetas_html = []
 for s in SISTEMAS:
     tarjetas_html.append(f"""
@@ -373,7 +347,6 @@ portal_html = f"""<!DOCTYPE html>
         justify-content: space-between;
         background: linear-gradient(180deg, rgba(2,10,24,0.35) 0%, rgba(2,12,28,0.18) 50%, rgba(2,10,24,0.45) 100%);
     }}
-    /* HEADER */
     .topbar {{
         display: flex;
         justify-content: space-between;
@@ -432,7 +405,6 @@ portal_html = f"""<!DOCTYPE html>
         font-weight: 700;
         color: #ffffff;
     }}
-    /* GRID 3x2 */
     .grid-container {{
         padding: 10px 36px 20px 36px;
         display: grid;
@@ -475,7 +447,6 @@ portal_html = f"""<!DOCTYPE html>
         overflow: hidden;
         transition: transform 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease;
     }}
-    /* Resplandor inferior igual al de la imagen */
     .card::before {{
         content: "";
         position: absolute;
@@ -562,7 +533,6 @@ portal_html = f"""<!DOCTYPE html>
         color: #020b18;
         transform: translateX(3px);
     }}
-    /* BARRA INFERIOR */
     .bottombar {{
         display: flex;
         justify-content: space-between;
@@ -637,7 +607,7 @@ portal_html = f"""<!DOCTYPE html>
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
-                <span id="live-clock">08:57:00 AM</span>
+                <span id="live-clock">08:59:00 AM</span>
             </div>
         </div>
     </header>
@@ -693,7 +663,6 @@ portal_html = f"""<!DOCTYPE html>
 </html>
 """
 
-# Quitar márgenes superiores de Streamlit alrededor del componente sin tocar la sidebar
 st.markdown(
     '<style>.block-container{padding:0 !important;max-width:100% !important;}'
     'iframe{display:block;border:none;}</style>',
