@@ -11,7 +11,7 @@ st.set_page_config(
     page_title="Interfaz Miaa",
     page_icon="https://www.miaa.mx/favicon.ico",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 LOGO_URL = "https://raw.githubusercontent.com/Miaa-Aguascalientes/Logos/38504978c8f77a4dac38ad476f74dbdee6af2cad/LogoMIAA.svg"
@@ -286,14 +286,24 @@ FONDO_B64 = obtener_fondo_base64()
 for s in SISTEMAS:
     s["img_b64"] = obtener_icono_tarjeta(s["id"], s["archivo_local"])
 
-# Limpiar franjas grises de Streamlit sin ocultar el botón de la barra lateral
+# Eliminar franjas grises de Streamlit sin dejar huecos
 st.markdown(
     """
     <style>
-        [data-testid="stHeader"] {
-            background: rgba(2, 11, 24, 0.35) !important;
-            height: 2.2rem !important;
+        [data-testid="stHeader"],
+        [data-testid="stToolbar"],
+        [data-testid="stDecoration"],
+        [data-testid="stStatusWidget"],
+        [data-testid="stSidebar"],
+        [data-testid="collapsedControl"],
+        #MainMenu,
+        footer {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            width: 0 !important;
         }
+        html, body,
         [data-testid="stAppViewContainer"],
         .stApp,
         .main,
@@ -301,15 +311,15 @@ st.markdown(
             background: #020b18 !important;
             padding: 0 !important;
             margin: 0 !important;
-            max-width: 100% !important;
-        }
-        [data-testid="stSidebar"] {
-            background: linear-gradient(180deg, #031124 0%, #051f3f 100%) !important;
-            border-right: 1px solid rgba(56, 189, 248, 0.25) !important;
+            max-width: 100vw !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            overflow: hidden !important;
         }
         iframe {
             display: block !important;
-            width: 100% !important;
+            width: 100vw !important;
+            height: 100vh !important;
             border: none !important;
             margin: 0 !important;
             padding: 0 !important;
@@ -318,19 +328,6 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
-with st.sidebar:
-    st.markdown(
-        f'<div style="text-align:center;padding:8px 0 14px 0;border-bottom:1px solid rgba(56,189,248,0.25);">'
-        f'<img src="{LOGO_URL}" width="155" height="46" style="width:155px;height:46px;object-fit:contain;">'
-        f'</div>',
-        unsafe_allow_html=True
-    )
-    st.markdown("### Sistemas MIAA")
-    for s in SISTEMAS:
-        st.markdown(f"- [{s['titulo_plano']}]({s['url']})")
-    st.markdown("---")
-    st.caption("Dirección de Planeación • Subdirección de Tecnología e Innovación")
 
 tarjetas_html = []
 for s in SISTEMAS:
@@ -374,7 +371,7 @@ portal_html = f"""<!DOCTYPE html>
     }}
     .wrapper {{
         width: 100%;
-        height: 100vh;
+        height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -384,32 +381,32 @@ portal_html = f"""<!DOCTYPE html>
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 12px 32px 6px 32px;
+        padding: 18px 36px 8px 36px;
     }}
     .brand-group {{
         display: flex;
         align-items: center;
-        gap: 20px;
+        gap: 22px;
     }}
     .brand-logo {{
-        height: 58px;
+        height: 64px;
         width: auto;
-        filter: brightness(0) invert(1) drop-shadow(0 3px 10px rgba(0, 0, 0, 0.65));
+        filter: brightness(0) invert(1) drop-shadow(0 3px 12px rgba(0, 0, 0, 0.65));
     }}
     .brand-sep {{
         width: 2px;
-        height: 48px;
+        height: 52px;
         background: rgba(255, 255, 255, 0.72);
     }}
     .brand-titles h1 {{
-        font-size: 1.5rem;
+        font-size: 1.6rem;
         font-weight: 700;
         color: #ffffff;
         letter-spacing: 0.2px;
         text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75);
     }}
     .brand-titles p {{
-        font-size: 1.08rem;
+        font-size: 1.14rem;
         font-weight: 400;
         color: #cbd5e1;
         margin-top: 2px;
@@ -419,30 +416,30 @@ portal_html = f"""<!DOCTYPE html>
         background: rgba(5, 19, 38, 0.68);
         border: 1px solid rgba(186, 230, 253, 0.32);
         border-radius: 10px;
-        padding: 8px 16px;
+        padding: 9px 18px;
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-        min-width: 195px;
+        min-width: 200px;
     }}
     .clock-row {{
         display: flex;
         align-items: center;
-        gap: 9px;
-        font-size: 0.88rem;
+        gap: 10px;
+        font-size: 0.9rem;
         color: #e2e8f0;
     }}
     .clock-row + .clock-row {{
-        margin-top: 4px;
-        font-size: 1.05rem;
+        margin-top: 5px;
+        font-size: 1.08rem;
         font-weight: 700;
         color: #ffffff;
     }}
     .grid-container {{
-        padding: 6px 32px;
+        padding: 8px 36px;
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 20px;
+        gap: 22px;
         max-width: 1560px;
         width: 100%;
         margin: 0 auto;
@@ -451,9 +448,9 @@ portal_html = f"""<!DOCTYPE html>
         position: relative;
         display: flex;
         align-items: center;
-        gap: 16px;
-        height: 176px;
-        padding: 14px 18px;
+        gap: 18px;
+        height: 186px;
+        padding: 15px 20px;
         border-radius: 18px;
         text-decoration: none;
         color: #ffffff;
@@ -473,7 +470,7 @@ portal_html = f"""<!DOCTYPE html>
         left: 0;
         right: 0;
         bottom: 0;
-        height: 40px;
+        height: 42px;
         background: linear-gradient(0deg, rgba(var(--glow-rgb), 0.38) 0%, transparent 100%);
         pointer-events: none;
     }}
@@ -489,7 +486,7 @@ portal_html = f"""<!DOCTYPE html>
         box-shadow: 0 -2px 16px var(--glow), 0 0 28px var(--glow);
     }}
     .card:hover {{
-        transform: translateY(-4px);
+        transform: translateY(-5px);
         border-color: var(--glow);
         box-shadow:
             0 18px 38px rgba(0, 0, 0, 0.72),
@@ -497,9 +494,9 @@ portal_html = f"""<!DOCTYPE html>
             inset 0 1px 2px rgba(255, 255, 255, 0.38);
     }}
     .card-media {{
-        flex: 0 0 142px;
-        width: 142px;
-        height: 140px;
+        flex: 0 0 150px;
+        width: 150px;
+        height: 146px;
         border-radius: 14px;
         overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.2);
@@ -518,7 +515,7 @@ portal_html = f"""<!DOCTYPE html>
         z-index: 1;
     }}
     .card-title {{
-        font-size: 1.24rem;
+        font-size: 1.28rem;
         font-weight: 700;
         line-height: 1.18;
         color: #ffffff;
@@ -526,16 +523,16 @@ portal_html = f"""<!DOCTYPE html>
         text-shadow: 0 2px 8px rgba(0, 0, 0, 0.65);
     }}
     .card-desc {{
-        font-size: 0.88rem;
+        font-size: 0.9rem;
         font-weight: 400;
-        line-height: 1.28;
+        line-height: 1.3;
         color: #dbeafe;
         text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
     }}
     .card-arrow {{
-        flex: 0 0 34px;
-        width: 34px;
-        height: 34px;
+        flex: 0 0 36px;
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
         border: 2px solid var(--glow);
         display: flex;
@@ -557,17 +554,17 @@ portal_html = f"""<!DOCTYPE html>
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 9px 32px;
+        padding: 10px 36px;
         background: rgba(3, 14, 30, 0.82);
         border-top: 1px solid rgba(186, 230, 253, 0.22);
         backdrop-filter: blur(12px);
-        font-size: 0.86rem;
+        font-size: 0.88rem;
         color: #e2e8f0;
     }}
     .bottom-left {{
         display: flex;
         align-items: center;
-        gap: 11px;
+        gap: 12px;
     }}
     .bars {{
         display: flex;
@@ -583,12 +580,12 @@ portal_html = f"""<!DOCTYPE html>
     .bottom-right {{
         display: flex;
         align-items: center;
-        gap: 16px;
+        gap: 18px;
     }}
     .bottom-action {{
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 7px;
         cursor: pointer;
         opacity: 0.92;
     }}
@@ -614,7 +611,7 @@ portal_html = f"""<!DOCTYPE html>
         </div>
         <div class="clock-widget">
             <div class="clock-row">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                     <line x1="16" y1="2" x2="16" y2="6"></line>
                     <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -623,11 +620,11 @@ portal_html = f"""<!DOCTYPE html>
                 <span id="live-date">26 Noviembre 2026</span>
             </div>
             <div class="clock-row">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
-                <span id="live-clock">09:01:00 AM</span>
+                <span id="live-clock">09:02:00 AM</span>
             </div>
         </div>
     </header>
@@ -683,4 +680,4 @@ portal_html = f"""<!DOCTYPE html>
 </html>
 """
 
-components.html(portal_html, height=650, scrolling=False)
+components.html(portal_html, height=760, scrolling=False)
