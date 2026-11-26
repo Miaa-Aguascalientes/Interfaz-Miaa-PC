@@ -16,14 +16,12 @@ SISTEMAS = [
         "descripcion": "Monitoreo y control de pozos y equipos",
         "url": "https://sistema-scada.streamlit.app/",
         "glow": "#00d4ff",
-        "glow_rgba": "rgba(0, 212, 255, 0.55)",
+        "glow_rgba": "rgba(0, 212, 255, 0.6)",
         "icon": (
-            '<svg viewBox="0 0 128 112" width="108" height="94" xmlns="http://www.w3.org/2000/svg">'
-            '<defs>'
-            '<linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">'
+            '<svg viewBox="0 0 128 112" width="98" height="86" xmlns="http://www.w3.org/2000/svg">'
+            '<defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">'
             '<stop offset="0%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#0369a1"/>'
-            '</linearGradient>'
-            '</defs>'
+            '</linearGradient></defs>'
             '<rect x="46" y="10" width="68" height="44" rx="5" fill="#071b33" stroke="#38bdf8" stroke-width="2"/>'
             '<polyline points="53,41 65,27 76,34 91,18 106,25" fill="none" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round"/>'
             '<circle cx="91" cy="18" r="3" fill="#ffffff"/>'
@@ -44,14 +42,12 @@ SISTEMAS = [
         "descripcion": "Lecturas y análisis de medidores",
         "url": "https://lecturas-hes.streamlit.app/",
         "glow": "#00e5ff",
-        "glow_rgba": "rgba(0, 229, 255, 0.55)",
+        "glow_rgba": "rgba(0, 229, 255, 0.6)",
         "icon": (
-            '<svg viewBox="0 0 128 112" width="108" height="94" xmlns="http://www.w3.org/2000/svg">'
-            '<defs>'
-            '<radialGradient id="m1" cx="45%" cy="40%" r="55%">'
+            '<svg viewBox="0 0 128 112" width="98" height="86" xmlns="http://www.w3.org/2000/svg">'
+            '<defs><radialGradient id="m1" cx="45%" cy="40%" r="55%">'
             '<stop offset="0%" stop-color="#f1f5f9"/><stop offset="75%" stop-color="#94a3b8"/><stop offset="100%" stop-color="#334155"/>'
-            '</radialGradient>'
-            '</defs>'
+            '</radialGradient></defs>'
             '<path d="M 48 21 Q 64 8 80 21" fill="none" stroke="#22d3ee" stroke-width="3" stroke-linecap="round"/>'
             '<path d="M 54 28 Q 64 19 74 28" fill="none" stroke="#22d3ee" stroke-width="3" stroke-linecap="round"/>'
             '<rect x="12" y="57" width="104" height="16" rx="3" fill="#0284c7" stroke="#38bdf8" stroke-width="1.5"/>'
@@ -70,9 +66,9 @@ SISTEMAS = [
         "descripcion": "Información geográfica y sectorización",
         "url": "https://miaa-sincronizador-ver-app.streamlit.app/",
         "glow": "#10b981",
-        "glow_rgba": "rgba(16, 185, 129, 0.55)",
+        "glow_rgba": "rgba(16, 185, 129, 0.6)",
         "icon": (
-            '<svg viewBox="0 0 128 112" width="108" height="94" xmlns="http://www.w3.org/2000/svg">'
+            '<svg viewBox="0 0 128 112" width="98" height="86" xmlns="http://www.w3.org/2000/svg">'
             '<polygon points="18,40 46,30 46,84 18,94" fill="#065f46" stroke="#34d399" stroke-width="1.5"/>'
             '<polygon points="46,30 76,40 76,94 46,84" fill="#047857" stroke="#34d399" stroke-width="1.5"/>'
             '<polygon points="76,40 106,30 106,84 76,94" fill="#059669" stroke="#34d399" stroke-width="1.5"/>'
@@ -87,14 +83,12 @@ SISTEMAS = [
         "descripcion": "Gestión de mantenimiento y fallas",
         "url": "https://incidencias-miaa.streamlit.app/",
         "glow": "#f59e0b",
-        "glow_rgba": "rgba(245, 158, 11, 0.55)",
+        "glow_rgba": "rgba(245, 158, 11, 0.6)",
         "icon": (
-            '<svg viewBox="0 0 128 112" width="108" height="94" xmlns="http://www.w3.org/2000/svg">'
-            '<defs>'
-            '<linearGradient id="w1" x1="0" y1="0" x2="1" y2="1">'
+            '<svg viewBox="0 0 128 112" width="98" height="86" xmlns="http://www.w3.org/2000/svg">'
+            '<defs><linearGradient id="w1" x1="0" y1="0" x2="1" y2="1">'
             '<stop offset="0%" stop-color="#f8fafc"/><stop offset="60%" stop-color="#94a3b8"/><stop offset="100%" stop-color="#475569"/>'
-            '</linearGradient>'
-            '</defs>'
+            '</linearGradient></defs>'
             '<g transform="translate(58, 56)">'
             '<circle cx="0" cy="0" r="24" fill="none" stroke="url(#w1)" stroke-width="11" stroke-dasharray="11 7.8"/>'
             '<circle cx="0" cy="0" r="21" fill="#07192f" stroke="#cbd5e1" stroke-width="2.5"/>'
@@ -115,9 +109,9 @@ SISTEMAS = [
         "descripcion": "Indicadores y reportes ejecutivos",
         "url": "https://tableros-miaa.streamlit.app/",
         "glow": "#8b5cf6",
-        "glow_rgba": "rgba(139, 92, 246, 0.55)",
+        "glow_rgba": "rgba(139, 92, 246, 0.6)",
         "icon": (
-            '<svg viewBox="0 0 128 112" width="108" height="94" xmlns="http://www.w3.org/2000/svg">'
+            '<svg viewBox="0 0 128 112" width="98" height="86" xmlns="http://www.w3.org/2000/svg">'
             '<rect x="18" y="18" width="92" height="56" rx="6" fill="#09182e" stroke="#60a5fa" stroke-width="2.5"/>'
             '<polygon points="55,74 73,74 79,88 49,88" fill="#3b82f6"/>'
             '<rect x="41" y="88" width="46" height="5" rx="2" fill="#93c5fd"/>'
@@ -135,14 +129,12 @@ SISTEMAS = [
         "descripcion": "Lecturas y análisis de consumo",
         "url": "https://hes-consumo.streamlit.app/",
         "glow": "#06b6d4",
-        "glow_rgba": "rgba(6, 182, 212, 0.55)",
+        "glow_rgba": "rgba(6, 182, 212, 0.6)",
         "icon": (
-            '<svg viewBox="0 0 128 112" width="108" height="94" xmlns="http://www.w3.org/2000/svg">'
-            '<defs>'
-            '<linearGradient id="d1" x1="0" y1="0" x2="0" y2="1">'
+            '<svg viewBox="0 0 128 112" width="98" height="86" xmlns="http://www.w3.org/2000/svg">'
+            '<defs><linearGradient id="d1" x1="0" y1="0" x2="0" y2="1">'
             '<stop offset="0%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#0284c7"/>'
-            '</linearGradient>'
-            '</defs>'
+            '</linearGradient></defs>'
             '<polygon points="54,22 18,52 26,52 26,88 82,88 82,52 90,52" fill="#cbd5e1" stroke="#38bdf8" stroke-width="2"/>'
             '<polygon points="54,18 14,51 20,56 54,27 88,56 94,51" fill="#0284c7"/>'
             '<rect x="36" y="60" width="14" height="28" rx="2" fill="#0f172a"/>'
@@ -163,16 +155,7 @@ st.markdown(
     '#MainMenu, footer {visibility: hidden;}'
     '[data-testid="stSidebar"] {'
     '  background: linear-gradient(180deg, #031124 0%, #051f3f 100%) !important;'
-    '  border-right: 1px solid rgba(0, 212, 255, 0.28) !important;'
-    '}'
-    '[data-testid="stSidebar"] * {color: #e2e8f0;}'
-    '[data-testid="collapsedControl"], [data-testid="stSidebarCollapseButton"] {'
-    '  visibility: visible !important;'
-    '  opacity: 1 !important;'
-    '  color: #38bdf8 !important;'
-    '  background-color: rgba(4, 24, 48, 0.9) !important;'
-    '  border: 1px solid rgba(56, 189, 248, 0.45) !important;'
-    '  border-radius: 8px !important;'
+    '  border-right: 1px solid rgba(0, 212, 255, 0.25) !important;'
     '}'
     '.stApp {'
     '  background:'
@@ -185,112 +168,125 @@ st.markdown(
     '.block-container {'
     '  padding-top: 0.8rem !important;'
     '  padding-bottom: 4.2rem !important;'
-    '  padding-left: 2rem !important;'
-    '  padding-right: 2rem !important;'
+    '  padding-left: 1.8rem !important;'
+    '  padding-right: 1.8rem !important;'
     '  max-width: 1480px;'
     '}'
     '.miaa-top {'
     '  display: flex;'
     '  justify-content: space-between;'
     '  align-items: center;'
-    '  padding: 4px 6px 18px 6px;'
+    '  padding: 4px 6px 16px 6px;'
     '  border-bottom: 1px solid rgba(125, 211, 252, 0.2);'
-    '  margin-bottom: 22px;'
+    '  margin-bottom: 20px;'
     '}'
-    '.miaa-brand {display: flex; align-items: center; gap: 20px;}'
-    '.miaa-brand img {height: 58px; width: auto; filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(56,189,248,0.45));}'
-    '.miaa-vsep {width: 2px; height: 48px; background: rgba(255,255,255,0.55);}'
-    '.miaa-titles h1 {margin: 0; font-size: 1.55rem; font-weight: 700; color: #ffffff; line-height: 1.15;}'
-    '.miaa-titles p {margin: 4px 0 0 0; font-size: 1.08rem; font-weight: 400; color: #bae6fd;}'
-    '.miaa-top-right {display: flex; align-items: center; gap: 18px;}'
+    '.miaa-brand {display: flex; align-items: center; gap: 18px;}'
+    '.miaa-brand img {height: 54px; width: auto; filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(56,189,248,0.45));}'
+    '.miaa-vsep {width: 2px; height: 44px; background: rgba(255,255,255,0.55);}'
+    '.miaa-titles h1 {margin: 0; font-size: 1.5rem; font-weight: 700; color: #ffffff; line-height: 1.15;}'
+    '.miaa-titles p {margin: 4px 0 0 0; font-size: 1.05rem; font-weight: 400; color: #bae6fd;}'
+    '.miaa-top-right {display: flex; align-items: center; gap: 16px;}'
     '.miaa-clock-card {'
-    '  background: rgba(5, 22, 44, 0.72);'
+    '  background: rgba(5, 22, 44, 0.75);'
     '  border: 1px solid rgba(125, 211, 252, 0.35);'
     '  border-radius: 10px;'
-    '  padding: 8px 16px;'
-    '  backdrop-filter: blur(10px);'
-    '  min-width: 188px;'
+    '  padding: 8px 14px;'
+    '  min-width: 182px;'
     '}'
-    '.miaa-clock-row {display: flex; align-items: center; gap: 8px; font-size: 0.88rem; color: #e2e8f0; margin-bottom: 4px;}'
-    '.miaa-clock-row:last-child {margin-bottom: 0; font-size: 1.06rem; font-weight: 700; color: #ffffff;}'
-    'a.miaa-card {'
-    '  text-decoration: none !important;'
-    '  color: #ffffff !important;'
-    '  display: flex;'
-    '  align-items: center;'
-    '  justify-content: space-between;'
-    '  background: linear-gradient(145deg, rgba(14, 42, 78, 0.68) 0%, rgba(5, 18, 36, 0.86) 100%);'
-    '  border: 1.5px solid rgba(147, 197, 253, 0.32);'
-    '  border-radius: 16px;'
-    '  padding: 16px 20px;'
-    '  min-height: 158px;'
-    '  margin-bottom: 18px;'
-    '  backdrop-filter: blur(12px);'
-    '  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.18);'
+    '.miaa-clock-row {display: flex; align-items: center; gap: 8px; font-size: 0.86rem; color: #e2e8f0; margin-bottom: 4px;}'
+    '.miaa-clock-row:last-child {margin-bottom: 0; font-size: 1.02rem; font-weight: 700; color: #ffffff;}'
+    '.miaa-grid {'
+    '  display: grid;'
+    '  grid-template-columns: repeat(3, minmax(0, 1fr));'
+    '  gap: 20px;'
+    '}'
+    '@media (max-width: 1100px) {'
+    '  .miaa-grid {grid-template-columns: repeat(2, minmax(0, 1fr));}'
+    '}'
+    '@media (max-width: 720px) {'
+    '  .miaa-grid {grid-template-columns: 1fr;}'
+    '}'
+    '.miaa-tile {'
     '  position: relative;'
+    '  display: grid;'
+    '  grid-template-columns: 108px 1fr 34px;'
+    '  align-items: center;'
+    '  gap: 14px;'
+    '  height: 156px;'
+    '  padding: 16px 18px;'
+    '  border-radius: 16px;'
+    '  background: linear-gradient(145deg, rgba(14, 42, 78, 0.72) 0%, rgba(5, 18, 36, 0.88) 100%);'
+    '  border: 1.5px solid rgba(147, 197, 253, 0.32);'
+    '  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.18);'
     '  overflow: hidden;'
-    '  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;'
+    '  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;'
     '}'
-    'a.miaa-card::after {'
+    '.miaa-tile::after {'
     '  content: "";'
     '  position: absolute;'
     '  bottom: 0;'
     '  left: 6%;'
     '  right: 6%;'
     '  height: 4px;'
-    '  background: var(--glow);'
+    '  background: var(--g);'
     '  border-radius: 4px 4px 0 0;'
-    '  box-shadow: 0 -2px 14px var(--glow-rgba), 0 0 22px var(--glow-rgba);'
+    '  box-shadow: 0 -2px 14px var(--gr), 0 0 22px var(--gr);'
     '}'
-    'a.miaa-card:hover {'
+    '.miaa-tile:hover {'
     '  transform: translateY(-4px);'
-    '  border-color: var(--glow);'
-    '  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.7), 0 0 18px var(--glow-rgba);'
+    '  border-color: var(--g);'
+    '  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.7), 0 0 18px var(--gr);'
     '}'
-    '.miaa-card-icon {'
-    '  flex: 0 0 112px;'
-    '  height: 112px;'
+    '.miaa-tile-link {'
+    '  position: absolute;'
+    '  inset: 0;'
+    '  z-index: 3;'
+    '  text-decoration: none !important;'
+    '}'
+    '.miaa-tile-icon {'
+    '  width: 108px;'
+    '  height: 108px;'
     '  display: flex;'
     '  align-items: center;'
     '  justify-content: center;'
     '  background: rgba(3, 14, 29, 0.55);'
     '  border: 1px solid rgba(186, 230, 253, 0.14);'
     '  border-radius: 12px;'
+    '  z-index: 1;'
     '}'
-    '.miaa-card-body {flex: 1; padding: 0 12px 0 18px;}'
-    '.miaa-card-title {font-size: 1.25rem; font-weight: 700; color: #ffffff; line-height: 1.18; margin-bottom: 6px;}'
-    '.miaa-card-desc {font-size: 0.88rem; font-weight: 400; color: #cbd5e1; line-height: 1.28;}'
-    '.miaa-card-btn {'
-    '  flex: 0 0 34px;'
-    '  width: 34px;'
-    '  height: 34px;'
+    '.miaa-tile-text {z-index: 1; min-width: 0;}'
+    '.miaa-tile-title {font-size: 1.2rem; font-weight: 700; color: #ffffff; line-height: 1.18; margin-bottom: 6px;}'
+    '.miaa-tile-desc {font-size: 0.86rem; font-weight: 400; color: #cbd5e1; line-height: 1.28;}'
+    '.miaa-tile-arrow {'
+    '  width: 32px;'
+    '  height: 32px;'
     '  border-radius: 50%;'
-    '  border: 2px solid var(--glow);'
+    '  border: 2px solid var(--g);'
     '  display: flex;'
     '  align-items: center;'
     '  justify-content: center;'
     '  color: #ffffff;'
-    '  font-size: 1rem;'
+    '  font-size: 0.95rem;'
     '  font-weight: 700;'
-    '  align-self: flex-end;'
-    '  background: rgba(2, 11, 23, 0.45);'
+    '  align-self: end;'
+    '  background: rgba(2, 11, 23, 0.5);'
+    '  z-index: 1;'
     '}'
     '.miaa-bottom-bar {'
     '  position: fixed;'
     '  bottom: 0;'
     '  left: 0;'
     '  right: 0;'
-    '  height: 40px;'
-    '  background: rgba(2, 11, 23, 0.92);'
+    '  height: 38px;'
+    '  background: rgba(2, 11, 23, 0.94);'
     '  border-top: 1px solid rgba(125, 211, 252, 0.25);'
-    '  backdrop-filter: blur(12px);'
     '  display: flex;'
     '  justify-content: space-between;'
     '  align-items: center;'
-    '  padding: 0 28px;'
+    '  padding: 0 24px;'
     '  padding-right: 175px;'
     '  z-index: 980;'
-    '  font-size: 0.84rem;'
+    '  font-size: 0.82rem;'
     '  color: #cbd5e1;'
     '}'
     '.miaa-bottom-left {display: flex; align-items: center; gap: 10px;}'
@@ -304,21 +300,17 @@ st.markdown(
 
 with st.sidebar:
     st.markdown(
-        f'<div style="text-align:center;padding:8px 0 14px 0;border-bottom:1px solid rgba(56,189,248,0.22);">'
-        f'<img src="{LOGO_URL}" style="height:42px;filter:brightness(0) invert(1);">'
-        f'<div style="color:#7dd3fc;font-size:0.82rem;margin-top:6px;">Sistemas MIAA</div>'
+        f'<div style="text-align:center;padding:6px 0 12px 0;">'
+        f'<img src="{LOGO_URL}" style="height:40px;filter:brightness(0) invert(1);">'
         f'</div>',
         unsafe_allow_html=True
     )
-    st.markdown("### Módulos")
+    st.markdown("### Sistemas")
     for s in SISTEMAS:
-        nombre = s["titulo"].replace("<br>", " ")
-        st.markdown(f"- [{nombre}]({s['url']})")
-    st.markdown("---")
-    st.caption("Aguascalientes • Monitoreo y Telemetría")
+        st.page_link(s["url"], label=s["titulo"].replace("<br>", " "))
 
 tank_svg = (
-    '<svg width="78" height="68" viewBox="0 0 90 80" style="opacity:0.75;" xmlns="http://www.w3.org/2000/svg">'
+    '<svg width="74" height="64" viewBox="0 0 90 80" style="opacity:0.75;" xmlns="http://www.w3.org/2000/svg">'
     '<path d="M 18 12 Q 45 4 72 12 L 72 36 Q 45 42 18 36 Z" fill="#1e4976" stroke="#7dd3fc" stroke-width="1.5"/>'
     '<text x="45" y="28" font-family="Inter,sans-serif" font-size="11" font-weight="800" fill="#041528" text-anchor="middle">miaa</text>'
     '<line x1="24" y1="37" x2="20" y2="75" stroke="#7dd3fc" stroke-width="2"/>'
@@ -329,7 +321,7 @@ tank_svg = (
     '</svg>'
 )
 
-header_html = (
+st.markdown(
     '<div class="miaa-top">'
     '<div class="miaa-brand">'
     f'<img src="{LOGO_URL}" alt="MIAA">'
@@ -343,32 +335,30 @@ header_html = (
     f'{tank_svg}'
     '<div class="miaa-clock-card">'
     '<div class="miaa-clock-row"><span>📅</span><span id="live-date">26 Noviembre 2026</span></div>'
-    '<div class="miaa-clock-row"><span>🕒</span><span id="live-clock">08:50:00 AM</span></div>'
+    '<div class="miaa-clock-row"><span>🕒</span><span id="live-clock">08:51:00 AM</span></div>'
     '</div>'
     '</div>'
-    '</div>'
+    '</div>',
+    unsafe_allow_html=True
 )
-st.markdown(header_html, unsafe_allow_html=True)
 
-for fila in range(0, len(SISTEMAS), 3):
-    cols = st.columns(3, gap="medium")
-    for idx, col in enumerate(cols):
-        if fila + idx < len(SISTEMAS):
-            item = SISTEMAS[fila + idx]
-            card_html = (
-                f'<a href="{item["url"]}" target="_blank" class="miaa-card" '
-                f'style="--glow:{item["glow"]};--glow-rgba:{item["glow_rgba"]};">'
-                f'<div class="miaa-card-icon">{item["icon"]}</div>'
-                f'<div class="miaa-card-body">'
-                f'<div class="miaa-card-title">{item["titulo"]}</div>'
-                f'<div class="miaa-card-desc">{item["descripcion"]}</div>'
-                f'</div>'
-                f'<div class="miaa-card-btn">&#10095;</div>'
-                f'</a>'
-            )
-            col.markdown(card_html, unsafe_allow_html=True)
+tiles_parts = ['<div class="miaa-grid">']
+for item in SISTEMAS:
+    tiles_parts.append(
+        f'<div class="miaa-tile" style="--g:{item["glow"]};--gr:{item["glow_rgba"]};">'
+        f'<a class="miaa-tile-link" href="{item["url"]}" target="_blank" aria-label="{item["titulo"].replace("<br>", " ")}"></a>'
+        f'<div class="miaa-tile-icon">{item["icon"]}</div>'
+        f'<div class="miaa-tile-text">'
+        f'<div class="miaa-tile-title">{item["titulo"]}</div>'
+        f'<div class="miaa-tile-desc">{item["descripcion"]}</div>'
+        f'</div>'
+        f'<div class="miaa-tile-arrow">&#10095;</div>'
+        f'</div>'
+    )
+tiles_parts.append('</div>')
+st.markdown("".join(tiles_parts), unsafe_allow_html=True)
 
-footer_html = (
+st.markdown(
     '<div class="miaa-bottom-bar">'
     '<div class="miaa-bottom-left">'
     '<div class="miaa-bars">'
@@ -386,9 +376,9 @@ footer_html = (
     '<span class="miaa-sep">|</span>'
     '<span>⏻ Cerrar Sesión</span>'
     '</div>'
-    '</div>'
+    '</div>',
+    unsafe_allow_html=True
 )
-st.markdown(footer_html, unsafe_allow_html=True)
 
 components.html(
     """
