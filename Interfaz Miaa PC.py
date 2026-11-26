@@ -1,291 +1,615 @@
 import streamlit as st
-from datetime import date
+import streamlit.components.v1 as components
 
+# 1. CONFIGURACIÓN DE PÁGINA (EXACTA A TU REQUERIMIENTO)
 st.set_page_config(
-    page_title="Modelo Integral de Aguas de Aguascalientes",
-    page_icon="💧",
+    page_title="Interfaz Miaa", 
+    page_icon="https://www.miaa.mx/favicon.ico", 
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
-query_params = st.query_params
-vista_actual = query_params.get("vista", "home")
+# 2. CONFIGURACIÓN DE TUS SISTEMAS Y URLS
+# Solo reemplaza el valor de "url" en cada diccionario con el enlace real de cada sistema.
+SISTEMAS = [
+    {
+        "titulo": "SCADA<br>Pozos y Equipos",
+        "descripcion": "Monitoreo y control de pozos y equipos",
+        "url": "https://sistema-scada.streamlit.app/",
+        "color_acento": "#00d4ff",
+        "icono_svg": """
+        <svg viewBox="0 0 120 110" width="105" height="95" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="pumpGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#00d4ff"/>
+                    <stop offset="100%" stop-color="#0052cc"/>
+                </linearGradient>
+                <filter id="glow1" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="3" result="blur"/>
+                    <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                </filter>
+            </defs>
+            <!-- Monitor detrás -->
+            <rect x="42" y="10" width="66" height="44" rx="5" fill="#06182c" stroke="#00d4ff" stroke-width="2" filter="url(#glow1)"/>
+            <polyline points="49,40 60,28 70,35 84,18 98,25" fill="none" stroke="#00f2fe" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="84" cy="18" r="3" fill="#ffffff"/>
+            <!-- Cuerpo de Bomba Hidráulica -->
+            <rect x="14" y="48" width="54" height="34" rx="6" fill="url(#pumpGrad)" stroke="#7ae7ff" stroke-width="1.5"/>
+            <line x1="24" y1="53" x2="24" y2="77" stroke="#031222" stroke-width="2.5"/>
+            <line x1="33" y1="53" x2="33" y2="77" stroke="#031222" stroke-width="2.5"/>
+            <line x1="42" y1="53" x2="42" y2="77" stroke="#031222" stroke-width="2.5"/>
+            <line x1="51" y1="53" x2="51" y2="77" stroke="#031222" stroke-width="2.5"/>
+            <!-- Caracol / Impulsor -->
+            <circle cx="82" cy="65" r="20" fill="#0b3b75" stroke="#00d4ff" stroke-width="2.5"/>
+            <circle cx="82" cy="65" r="9" fill="#041527" stroke="#00d4ff" stroke-width="2"/>
+            <rect x="76" y="34" width="12" height="14" fill="#0099ff" stroke="#7ae7ff" stroke-width="1.5"/>
+            <!-- Base -->
+            <rect x="10" y="84" width="94" height="7" rx="2" fill="#1e4976"/>
+        </svg>
+        """
+    },
+    {
+        "titulo": "Medidores<br>Inteligentes",
+        "descripcion": "Lecturas y análisis de medidores",
+        "url": "https://lecturas-hes.streamlit.app/",  # <-- Cambia por tu URL
+        "color_acento": "#00e5ff",
+        "icono_svg": """
+        <svg viewBox="0 0 120 110" width="105" height="95" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <radialGradient id="meterBody" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#e2e8f0"/>
+                    <stop offset="80%" stop-color="#94a3b8"/>
+                    <stop offset="100%" stop-color="#475569"/>
+                </radialGradient>
+            </defs>
+            <!-- Ondas WiFi / Telemetría -->
+            <path d="M 44 22 Q 60 8 76 22" fill="none" stroke="#00f2fe" stroke-width="3" stroke-linecap="round"/>
+            <path d="M 50 29 Q 60 19 70 29" fill="none" stroke="#00f2fe" stroke-width="3" stroke-linecap="round"/>
+            <!-- Tubería lateral -->
+            <rect x="10" y="56" width="100" height="18" rx="3" fill="#0284c7" stroke="#38bdf8" stroke-width="1.5"/>
+            <rect x="16" y="51" width="10" height="28" rx="2" fill="#0369a1"/>
+            <rect x="94" y="51" width="10" height="28" rx="2" fill="#0369a1"/>
+            <!-- Carátula del medidor -->
+            <circle cx="60" cy="65" r="30" fill="url(#meterBody)" stroke="#00d4ff" stroke-width="3"/>
+            <circle cx="60" cy="65" r="23" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5"/>
+            <!-- Pantalla digital -->
+            <rect x="42" y="53" width="36" height="12" rx="2" fill="#bae6fd"/>
+            <text x="60" y="62" font-family="monospace" font-size="8.5" font-weight="bold" fill="#0369a1" text-anchor="middle">000254.7</text>
+            <!-- Indicador flujo -->
+            <circle cx="60" cy="75" r="4" fill="#ef4444"/>
+            <path d="M 57 75 L 63 75" stroke="#ffffff" stroke-width="1.5"/>
+        </svg>
+        """
+    },
+    {
+        "titulo": "Mapa y GIS",
+        "descripcion": "Información geográfica y sectorización",
+        "url": "https://miaa-sincronizador-ver-app.streamlit.app/",  # <-- Cambia por tu URL
+        "color_acento": "#10b981",
+        "icono_svg": """
+        <svg viewBox="0 0 120 110" width="105" height="95" xmlns="http://www.w3.org/2000/svg">
+            <!-- Mapa plegado 3D -->
+            <polygon points="15,38 43,28 43,82 15,92" fill="#065f46" stroke="#34d399" stroke-width="1.5"/>
+            <polygon points="43,28 73,38 73,92 43,82" fill="#047857" stroke="#34d399" stroke-width="1.5"/>
+            <polygon points="73,38 103,28 103,82 73,92" fill="#059669" stroke="#34d399" stroke-width="1.5"/>
+            <!-- Red hidráulica sobre mapa -->
+            <polyline points="20,65 43,55 73,68 98,52" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
+            <polyline points="35,35 55,62 65,85" fill="none" stroke="#a7f3d0" stroke-width="2" stroke-dasharray="3,2"/>
+            <!-- Pin Rojo de Ubicación -->
+            <path d="M 73 12 C 62 12 54 20 54 30 C 54 44 73 60 73 60 C 73 60 92 44 92 30 C 92 20 84 12 73 12 Z" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
+            <circle cx="73" cy="29" r="7" fill="#ffffff"/>
+        </svg>
+        """
+    },
+    {
+        "titulo": "Mantenimiento",
+        "descripcion": "Gestión de mantenimiento y fallas",
+        "url": "https://incidencias-miaa.streamlit.app/",  # <-- Cambia por tu URL
+        "color_acento": "#f59e0b",
+        "icono_svg": """
+        <svg viewBox="0 0 120 110" width="105" height="95" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="metalGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#f1f5f9"/>
+                    <stop offset="50%" stop-color="#94a3b8"/>
+                    <stop offset="100%" stop-color="#475569"/>
+                </linearGradient>
+            </defs>
+            <!-- Engrane -->
+            <g transform="translate(56, 55)">
+                <circle cx="0" cy="0" r="24" fill="none" stroke="url(#metalGrad)" stroke-width="11" stroke-dasharray="11 7.8"/>
+                <circle cx="0" cy="0" r="21" fill="#0a192f" stroke="#cbd5e1" stroke-width="3"/>
+                <circle cx="0" cy="0" r="11" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+            </g>
+            <!-- Llave española cruzada -->
+            <g transform="rotate(-42 60 55)">
+                <rect x="20" y="49" width="80" height="12" rx="4" fill="url(#metalGrad)" stroke="#1e293b" stroke-width="1.5"/>
+                <circle cx="20" cy="55" r="11" fill="url(#metalGrad)" stroke="#1e293b" stroke-width="1.5"/>
+                <rect x="9" y="51" width="11" height="8" fill="#0a192f"/>
+                <circle cx="100" cy="55" r="11" fill="url(#metalGrad)" stroke="#1e293b" stroke-width="1.5"/>
+                <rect x="100" y="51" width="11" height="8" fill="#0a192f"/>
+            </g>
+        </svg>
+        """
+    },
+    {
+        "titulo": "Tableros y Reportes",
+        "descripcion": "Indicadores y reportes ejecutivos",
+        "url": "https://tableros-miaa.streamlit.app/",  # <-- Cambia por tu URL
+        "color_acento": "#8b5cf6",
+        "icono_svg": """
+        <svg viewBox="0 0 120 110" width="105" height="95" xmlns="http://www.w3.org/2000/svg">
+            <!-- Monitor Ejecutivo -->
+            <rect x="16" y="18" width="88" height="56" rx="6" fill="#091526" stroke="#60a5fa" stroke-width="2.5"/>
+            <!-- Base Monitor -->
+            <polygon points="52,74 68,74 74,88 46,88" fill="#3b82f6"/>
+            <rect x="38" y="88" width="44" height="5" rx="2" fill="#93c5fd"/>
+            <!-- Gráfica de barras -->
+            <rect x="26" y="52" width="7" height="14" rx="1" fill="#38bdf8"/>
+            <rect x="37" y="42" width="7" height="24" rx="1" fill="#00f2fe"/>
+            <rect x="48" y="47" width="7" height="19" rx="1" fill="#818cf8"/>
+            <rect x="59" y="33" width="7" height="33" rx="1" fill="#a78bfa"/>
+            <!-- Gráfica de dona -->
+            <circle cx="84" cy="46" r="12" fill="none" stroke="#1e3a8a" stroke-width="6"/>
+            <circle cx="84" cy="46" r="12" fill="none" stroke="#00d4ff" stroke-width="6" stroke-dasharray="48 30"/>
+            <!-- Línea de tendencia -->
+            <polyline points="26,38 42,29 58,32 72,24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        """
+    },
+    {
+        "titulo": "HES - Consumo",
+        "descripcion": "Lecturas y análisis de consumo",
+        "url": "https://hes-consumo.streamlit.app/",  # <-- Cambia por tu URL
+        "color_acento": "#06b6d4",
+        "icono_svg": """
+        <svg viewBox="0 0 120 110" width="105" height="95" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="dropGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#38bdf8"/>
+                    <stop offset="100%" stop-color="#0284c7"/>
+                </linearGradient>
+            </defs>
+            <!-- Casa -->
+            <polygon points="52,22 16,52 24,52 24,88 80,88 80,52 88,52" fill="#cbd5e1" stroke="#38bdf8" stroke-width="2"/>
+            <polygon points="52,18 12,51 18,56 52,27 86,56 92,51" fill="#0284c7"/>
+            <!-- Puerta y Ventana -->
+            <rect x="34" y="60" width="14" height="28" rx="2" fill="#0f172a"/>
+            <rect x="56" y="56" width="14" height="14" rx="1" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5"/>
+            <line x1="63" y1="56" x2="63" y2="70" stroke="#38bdf8" stroke-width="1"/>
+            <line x1="56" y1="63" x2="70" y2="63" stroke="#38bdf8" stroke-width="1"/>
+            <!-- Señal WiFi -->
+            <path d="M 78 24 Q 90 14 102 24" fill="none" stroke="#00f2fe" stroke-width="3" stroke-linecap="round"/>
+            <path d="M 83 31 Q 90 24 97 31" fill="none" stroke="#00f2fe" stroke-width="3" stroke-linecap="round"/>
+            <!-- Gota de Agua -->
+            <path d="M 90 46 C 90 46 74 66 74 78 C 74 87 81 94 90 94 C 99 94 106 87 106 78 C 106 66 90 46 90 46 Z" fill="url(#dropGrad)" stroke="#e0f2fe" stroke-width="2"/>
+            <path d="M 82 76 Q 82 84 88 87" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+        </svg>
+        """
+    }
+]
 
-css_ancho_total = ""
-if vista_actual != 'home':
-    css_ancho_total = """
-    .block-container {
-        max-width: 100% !important;
-        padding-left: 0rem !important;
-        padding-right: 0rem !important;
-        padding-top: 0rem !important;
-        padding-bottom: 0rem !important;
-        background-color: #050a10 !important;
-    }
-    
-    iframe {
-        width: 100% !important;
-        height: 100vh !important;
-        border: none !important;
-        background-color: #050a10 !important;
-    }
-    
-    div[data-testid="stIFrame"] {
-        width: 100% !important;
-        height: 100vh !important;
-        background-color: #050a10 !important;
-    }
-    """
+LOGO_URL = "https://raw.githubusercontent.com/Miaa-Aguascalientes/Logos/38504978c8f77a4dac38ad476f74dbdee6af2cad/LogoMIAA.svg"
 
+# 3. CSS PERSONALIZADO (ESTILO HUD / GLASSMORPHISM / FONDO ACUÁTICO)
 st.markdown(f"""
-    <style>
-    /* Configuración base y ajuste para subir componentes al máximo */
-    .stApp {{ background-color: #050a10 !important; color: #FFFFFF; font-family: 'sans-serif'; overflow-x: hidden; }}
-    .block-container {{ padding: 0px 10px !important; padding-top: 0rem !important; max-width: 100% !important; }}
-    header, footer {{ visibility: hidden !important; background-color: #050a10 !important; }}
-    #MainMenu {{ visibility: hidden; }}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 
-    .wave-background {{
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 0;
-        pointer-events: none;
-        background: radial-gradient(circle at 50% 20%, #0A1931 0%, #050a10 70%);
-        overflow: hidden;
+    /* Ocultar elementos nativos de Streamlit para pantalla limpia */
+    #MainMenu {{visibility: hidden;}}
+    footer {{visibility: hidden;}}
+    header {{visibility: hidden;}}
+
+    /* Contenedor principal con fondo azul profundo y efectos de agua */
+    .stApp {{
+        background: 
+            radial-gradient(ellipse at 75% 18%, rgba(0, 180, 255, 0.22) 0%, transparent 45%),
+            radial-gradient(ellipse at 20% 85%, rgba(0, 140, 255, 0.28) 0%, transparent 50%),
+            linear-gradient(180deg, #020b18 0%, #041d3a 35%, #03152b 70%, #020c1b 100%);
+        font-family: 'Inter', sans-serif;
+        color: #ffffff;
     }}
-    
-    .wave {{
+
+    /* Eliminar padding excesivo de Streamlit */
+    .block-container {{
+        padding-top: 1.5rem !important;
+        padding-bottom: 4.5rem !important;
+        padding-left: 3rem !important;
+        padding-right: 3rem !important;
+        max-width: 1500px;
+    }}
+
+    /* HEADER SUPERIOR */
+    .miaa-header {{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 5px 25px 5px;
+        border-bottom: 1px solid rgba(0, 212, 255, 0.18);
+        margin-bottom: 28px;
+        position: relative;
+    }}
+
+    .header-left {{
+        display: flex;
+        align-items: center;
+        gap: 24px;
+    }}
+
+    /* Filtro blanco para que el logo SVG destaque sobre fondo oscuro */
+    .miaa-logo {{
+        height: 62px;
+        width: auto;
+        filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(0, 212, 255, 0.45));
+    }}
+
+    .header-divider {{
+        width: 2px;
+        height: 52px;
+        background: linear-gradient(180deg, transparent, rgba(255,255,255,0.65), transparent);
+    }}
+
+    .header-titles h1 {{
+        margin: 0;
+        font-size: 1.65rem;
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: 0.3px;
+        line-height: 1.2;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+    }}
+
+    .header-titles p {{
+        margin: 4px 0 0 0;
+        font-size: 1.15rem;
+        font-weight: 400;
+        color: #a5d8ff;
+        letter-spacing: 0.2px;
+    }}
+
+    /* Ilustración decorativa del tanque elevado en header derecho */
+    .header-right-group {{
+        display: flex;
+        align-items: center;
+        gap: 25px;
+    }}
+
+    .tank-watermark {{
+        opacity: 0.75;
+        filter: drop-shadow(0 0 15px rgba(0, 195, 255, 0.35));
+    }}
+
+    /* Widget de Fecha y Hora */
+    .datetime-box {{
+        background: rgba(6, 24, 48, 0.65);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 12px;
+        padding: 10px 18px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        min-width: 195px;
+    }}
+
+    .dt-row {{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #e2e8f0;
+        font-size: 0.92rem;
+        margin-bottom: 5px;
+    }}
+
+    .dt-row:last-child {{
+        margin-bottom: 0;
+        font-size: 1.08rem;
+        font-weight: 700;
+        color: #ffffff;
+    }}
+
+    /* TARJETAS DE SISTEMAS (GRID 3x2) */
+    a.system-card {{
+        text-decoration: none !important;
+        color: inherit !important;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: linear-gradient(135deg, rgba(13, 38, 70, 0.72) 0%, rgba(6, 20, 40, 0.85) 100%);
+        border: 1px solid rgba(120, 200, 255, 0.28);
+        border-radius: 18px;
+        padding: 22px 24px;
+        height: 185px;
+        margin-bottom: 22px;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow: 
+            0 10px 30px rgba(0, 0, 0, 0.55),
+            inset 0 1px 1px rgba(255, 255, 255, 0.18);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.28s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }}
+
+    /* Línea de resplandor inferior dinámica por tarjeta */
+    a.system-card::after {{
+        content: "";
         position: absolute;
         bottom: 0;
-        left: 0;
-        width: 200%;
-        height: 100%;
-        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,0 C150,90 350,-40 500,40 C650,120 900,20 1200,60 L1200,120 L0,120 Z" fill="rgba(0, 168, 255, 0.04)"/></svg>');
-        background-repeat: repeat-x;
-        animation: wave-animation 15s linear infinite;
-    }}
-    
-    .wave:nth-of-type(2) {{
-        bottom: 10px;
-        opacity: 0.5;
-        animation: wave-animation 25s linear infinite reverse;
-        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,30 C200,100 400,0 600,50 C800,100 1000,10 1200,40 L1200,120 L0,120 Z" fill="rgba(0, 168, 255, 0.03)"/></svg>');
+        left: 8%;
+        right: 8%;
+        height: 4px;
+        background: var(--accent-color);
+        border-radius: 4px 4px 0 0;
+        box-shadow: 0 -2px 16px var(--accent-color), 0 0 25px var(--accent-color);
+        opacity: 0.9;
+        transition: all 0.28s ease;
     }}
 
-    @keyframes wave-animation {{
-        0% {{ transform: translateX(0); }}
-        100% {{ transform: translateX(-50%); }}
+    a.system-card:hover {{
+        transform: translateY(-6px) scale(1.015);
+        border-color: var(--accent-color);
+        background: linear-gradient(135deg, rgba(18, 52, 94, 0.85) 0%, rgba(8, 28, 54, 0.95) 100%);
+        box-shadow: 
+            0 16px 38px rgba(0, 0, 0, 0.7),
+            0 0 22px rgba(0, 212, 255, 0.25),
+            inset 0 1px 2px rgba(255, 255, 255, 0.3);
     }}
 
-    .main-content {{
-        position: relative;
-        z-index: 10;
-        max-width: 700px;
-        margin: 0 auto;
+    a.system-card:hover::after {{
+        left: 2%;
+        right: 2%;
+        height: 5px;
     }}
 
-    .grid-container {{
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-        margin-bottom: 12px;
-    }}
-    
-    .custom-card {{
-        background-color: rgba(13, 23, 43, 0.85);
-        border: 1px solid #1E2D4A;
-        border-radius: 14px;
-        padding: 14px 10px;
-        text-align: center;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    .card-icon-box {{
+        flex: 0 0 110px;
         display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        min-height: 195px;
-        backdrop-filter: blur(8px);
-        transition: border-color 0.3s, transform 0.2s;
-    }}
-    
-    .custom-card:hover {{
-        border-color: #00A8FF;
-        transform: translateY(-2px);
-    }}
-    
-    .status-card {{
-        background-color: rgba(13, 23, 43, 0.85);
-        border: 1px solid #1E2D4A;
-        border-radius: 16px;
-        padding: 12px 16px;
-        display: flex;
-        justify-content: space-between;
         align-items: center;
-        margin-top: 5px;
-        margin-bottom: 10px;
-        backdrop-filter: blur(8px);
-    }}
-    
-    .welcome-title {{
-        font-size: 24px;
-        font-weight: 700;
-        color: #FFFFFF;
-        margin-top: 0px;
-        margin-bottom: 2px;
-    }}
-    
-    .welcome-subtitle {{
-        font-size: 13px;
-        color: #94A3B8;
-        margin-bottom: 12px;
-    }}
-    
-    .card-title {{
-        font-size: 13px;
-        font-weight: 600;
-        color: #FFFFFF;
-        margin-top: 4px;
-        margin-bottom: 4px;
-    }}
-    
-    .card-desc {{
-        font-size: 10px;
-        color: #94A3B8;
-        margin-bottom: 10px;
-        line-height: 1.2;
-    }}
-    
-    .card-button {{
-        display: inline-flex;
         justify-content: center;
-        align-items: center;
-        width: 30px;
-        height: 30px;
-        background-color: #132238;
-        border: 1px solid #1E3A60;
+        background: rgba(3, 14, 28, 0.45);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        height: 132px;
+        padding: 8px;
+        box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+    }}
+
+    .card-text-box {{
+        flex: 1;
+        padding: 0 16px 0 20px;
+    }}
+
+    .card-title {{
+        font-size: 1.32rem;
+        font-weight: 700;
+        color: #ffffff;
+        line-height: 1.22;
+        margin-bottom: 8px;
+    }}
+
+    .card-desc {{
+        font-size: 0.92rem;
+        font-weight: 400;
+        color: #cbd5e1;
+        line-height: 1.35;
+    }}
+
+    .card-arrow {{
+        flex: 0 0 38px;
+        width: 38px;
+        height: 38px;
         border-radius: 50%;
-        color: #38BDF8;
-        text-decoration: none;
-        font-size: 13px;
-        margin: 0 auto;
+        border: 2px solid var(--accent-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        font-size: 1.1rem;
+        font-weight: bold;
+        align-self: flex-end;
+        background: rgba(0, 0, 0, 0.35);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        transition: all 0.25s ease;
+    }}
+
+    a.system-card:hover .card-arrow {{
+        background: var(--accent-color);
+        color: #020b18;
+        transform: translateX(3px);
+    }}
+
+    /* BARRA INFERIOR (FOOTER HUD) */
+    .miaa-footer {{
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 46px;
+        background: rgba(3, 13, 27, 0.92);
+        border-top: 1px solid rgba(0, 212, 255, 0.25);
+        backdrop-filter: blur(12px);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 36px;
+        z-index: 999;
+        font-size: 0.88rem;
+        color: #cbd5e1;
+    }}
+
+    .footer-left {{
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 500;
+    }}
+
+    .signal-bars {{
+        display: flex;
+        align-items: flex-end;
+        gap: 3px;
+        height: 14px;
+    }}
+
+    .signal-bars span {{
+        width: 3px;
+        background: #00d4ff;
+        border-radius: 1px;
+    }}
+
+    .footer-right {{
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }}
+
+    .footer-item {{
+        display: flex;
+        align-items: center;
+        gap: 7px;
         cursor: pointer;
-        transition: background-color 0.3s, color 0.3s;
-    }}
-    
-    .card-button:hover {{
-        background-color: #00A8FF;
-        color: #FFFFFF;
-    }}
-    
-    .footer-links {{
-        text-align: center;
-        color: #64748B;
-        font-size: 11px;
-        margin-top: 10px;
-    }}
-    
-    .footer-links a {{
-        color: #38BDF8;
-        text-decoration: none;
+        color: #e2e8f0;
+        transition: color 0.2s;
     }}
 
-    {css_ancho_total}
-    </style>
+    .footer-item:hover {{
+        color: #00d4ff;
+    }}
 
-    <div class="wave-background">
-        <div class="wave"></div>
-        <div class="wave"></div>
-    </div>
+    .footer-sep {{
+        color: rgba(255, 255, 255, 0.25);
+    }}
+
+    /* Barra lateral estilizada */
+    section[data-testid="stSidebar"] {{
+        background-color: #031022;
+        border-right: 1px solid rgba(0, 212, 255, 0.2);
+    }}
+</style>
 """, unsafe_allow_html=True)
 
-# -------------------------------------------------------------------------
-# VISTA PRINCIPAL (HOME)
-# -------------------------------------------------------------------------
-if vista_actual == 'home':
-    st.markdown('<div class="main-content">', unsafe_allow_html=True)
-
-    logo_url = "https://raw.githubusercontent.com/Miaa-Aguascalientes/Logos/38504978c8f77a4dac38ad476f74dbdee6af2cad/LogoMIAA.svg"
-    st.markdown(f'<div style="text-align: center; padding-top: 0px;"><img src="{logo_url}" width="130px" alt="Logo MIAA"><p style="color: #94A3B8; font-size: 10px; margin-top: 2px;">Sistema integral de Aguascalientes</p></div>', unsafe_allow_html=True)
-
-    st.markdown('<div class="welcome-title">¡Bienvenido!</div><div class="welcome-subtitle">Selecciona una opción para continuar</div>', unsafe_allow_html=True)
-
-    cards_html = """
-    <div class="grid-container">
-        <div class="custom-card">
-            <div>
-                <div style="font-size: 24px; color: #00A8FF; margin-bottom: 2px;">👤➕</div>
-                <div class="card-title">Registro de usuarios</div>
-                <div class="card-desc">Administra y registra nuevos usuarios del sistema</div>
-            </div>
-            <div><a href="?vista=registro" target="_self" class="card-button">➔</a></div>
-        </div>
-        <div class="custom-card">
-            <div>
-                <div style="font-size: 24px; color: #00A8FF; margin-bottom: 2px;">💧📊</div>
-                <div class="card-title">Sistema Scada</div>
-                <div class="card-desc">Monitorea en tiempo real pozos, tanques y equipos</div>
-            </div>
-            <div><a href="?vista=scada" target="_self" class="card-button">➔</a></div>
-        </div>
-        <div class="custom-card">
-            <div>
-                <div style="font-size: 24px; color: #00A8FF; margin-bottom: 2px;">🖥️📈</div>
-                <div class="card-title">Consola de OP</div>
-                <div class="card-desc">Visualiza y controla la operación del sistema</div>
-            </div>
-            <div><a href="?vista=op" target="_self" class="card-button">➔</a></div>
-        </div>
-        <div class="custom-card">
-            <div>
-                <div style="font-size: 24px; color: #F59E0B; margin-bottom: 2px;">⚠️</div>
-                <div class="card-title">Eventos operativos</div>
-                <div class="card-desc">Consulta eventos, alertas e incidencias del sistema</div>
-            </div>
-            <div><a href="?vista=eventos" target="_self" class="card-button">➔</a></div>
-        </div>
-        <div class="custom-card" style="grid-column: span 2;">
-            <div>
-                <div style="margin-bottom: 4px;"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" width="28px" alt="Logo Telegram" style="vertical-align: middle;"></div>
-                <div class="card-title">Registro Telegram</div>
-                <div class="card-desc">Gestiona altas y notificaciones vinculadas a Telegram</div>
-            </div>
-            <div><a href="?vista=telegram" target="_self" class="card-button">➔</a></div>
-        </div>
-    </div>
-    """
-    st.markdown(cards_html, unsafe_allow_html=True)
-
-    st.markdown("""
-        <div class="status-card">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <div style="font-size: 10px; color: #38BDF8;">🛡️</div>
-                <div>
-                    <div style="font-size: 12px; font-weight: 600; color: #FFFFFF;">Desarrollo. Pedro Guillermo Templos</div>
-                    <div style="font-size: 9px; color: #94A3B8;">Tecnologia e innovación.</div>
-                </div>
-            </div>
-            <div style="text-align: right; min-width: 80px;">
-                <span style="height: 6px; width: 6px; background-color: #22C55E; border-radius: 50%; display: inline-block; margin-right: 3px;"></span>
-                <span style="font-size: 9px; color: #22C55E; font-weight: 500;">Sistema en línea</span>
-            </div>
+# 4. BARRA LATERAL (ACCESO RÁPIDO Y OPCIONES)
+with st.sidebar:
+    st.markdown(f"""
+        <div style="text-align:center; padding: 15px 0 20px 0; border-bottom: 1px solid rgba(0,212,255,0.2);">
+            <img src="{LOGO_URL}" style="height: 48px; filter: brightness(0) invert(1);">
+            <p style="color:#7dd3fc; font-size:0.82rem; margin-top:8px; margin-bottom:0;">Portal Central de Sistemas</p>
         </div>
     """, unsafe_allow_html=True)
+    st.markdown("### Accesos Directos")
+    for s in SISTEMAS:
+        titulo_limpio = s["titulo"].replace("<br>", " ")
+        st.markdown(f"- [{titulo_limpio}]({s['url']})")
+    st.markdown("---")
+    st.caption("Dirección de Planeación • Subdirección de Tecnología e Innovación")
 
-    st.markdown('</div>', unsafe_allow_html=True)
+# 5. ENCABEZADO PRINCIPAL (LOGO MIAA + TÍTULO + TANQUE ELEVADO + RELOJ EN VIVO)
+st.markdown(f"""
+<div class="miaa-header">
+    <div class="header-left">
+        <img src="{LOGO_URL}" alt="Logo MIAA" class="miaa-logo">
+        <div class="header-divider"></div>
+        <div class="header-titles">
+            <h1>Sistema Integral de Monitoreo</h1>
+            <p>Agua Potable para Aguascalientes</p>
+        </div>
+    </div>
+    <div class="header-right-group">
+        <!-- Silueta estilizada de Tanque Elevado -->
+        <svg class="tank-watermark" width="82" height="72" viewBox="0 0 90 80" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 20 12 Q 45 4 70 12 L 70 36 Q 45 42 20 36 Z" fill="#1e4976" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="45" y="28" font-family="Inter, sans-serif" font-size="11" font-weight="800" fill="#020b18" text-anchor="middle">miaa</text>
+            <line x1="25" y1="37" x2="21" y2="75" stroke="#38bdf8" stroke-width="2"/>
+            <line x1="38" y1="39" x2="36" y2="75" stroke="#38bdf8" stroke-width="2"/>
+            <line x1="52" y1="39" x2="54" y2="75" stroke="#38bdf8" stroke-width="2"/>
+            <line x1="65" y1="37" x2="69" y2="75" stroke="#38bdf8" stroke-width="2"/>
+            <line x1="23" y1="55" x2="67" y2="55" stroke="#38bdf8" stroke-width="1.2"/>
+        </svg>
+        <div class="datetime-box">
+            <div class="dt-row">
+                <span>📅</span>
+                <span id="live-date">26 Noviembre 2026</span>
+            </div>
+            <div class="dt-row">
+                <span>🕒</span>
+                <span id="live-clock">08:39:00 AM</span>
+            </div>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
-# -------------------------------------------------------------------------
-# VISTA INTERNA
-# -------------------------------------------------------------------------
-else:
-    urls = {
-        'registro': "https://registro-de-usuarios.streamlit.app/?embed=true",
-        'scada': "https://sistema-scada-smartphone.streamlit.app/?embed=true",
-        'op': "https://telegram-scada.streamlit.app/?embed=true",
-        'eventos': "https://incidencias-en-sitios-miaa.streamlit.app/?embed=true",
-        'telegram': "https://registro-de-usuarios-telegram.streamlit.app/?embed=true"
+# 6. CUADRÍCULA DE TARJETAS (3 COLUMNAS x 2 FILAS)
+for fila in range(0, len(SISTEMAS), 3):
+    cols = st.columns(3, gap="medium")
+    for idx, col in enumerate(cols):
+        if fila + idx < len(SISTEMAS):
+            sys_item = SISTEMAS[fila + idx]
+            with col:
+                st.markdown(f"""
+                <a href="{sys_item['url']}" target="_blank" class="system-card" style="--accent-color: {sys_item['color_acento']};">
+                    <div class="card-icon-box">
+                        {sys_item['icono_svg']}
+                    </div>
+                    <div class="card-text-box">
+                        <div class="card-title">{sys_item['titulo']}</div>
+                        <div class="card-desc">{sys_item['descripcion']}</div>
+                    </div>
+                    <div class="card-arrow">&#10095;</div>
+                </a>
+                """, unsafe_allow_html=True)
+
+# 7. BARRA INFERIOR FIJA
+st.markdown("""
+<div class="miaa-footer">
+    <div class="footer-left">
+        <div class="signal-bars">
+            <span style="height:5px;"></span>
+            <span style="height:8px;"></span>
+            <span style="height:11px;"></span>
+            <span style="height:14px;"></span>
+        </div>
+        <span><strong>MIAA</strong> &nbsp;|&nbsp; Innovación, Tecnología y Agua para Todos</span>
+    </div>
+    <div class="footer-right">
+        <div class="footer-item">⚙️ <span>Configuración</span></div>
+        <span class="footer-sep">|</span>
+        <div class="footer-item">ℹ️ <span>Acerca de</span></div>
+        <span class="footer-sep">|</span>
+        <div class="footer-item">⏻ <span>Cerrar Sesión</span></div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# 8. SCRIPT PARA ACTUALIZAR RELOJ Y FECHA EN TIEMPO REAL EN EL DOM PRINCIPAL
+components.html("""
+<script>
+    function updateClock() {
+        const doc = window.parent.document;
+        const dateEl = doc.getElementById('live-date');
+        const clockEl = doc.getElementById('live-clock');
+        if (!dateEl || !clockEl) return;
+
+        const now = new Date();
+        const meses = [
+            "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+        ];
+        const dia = String(now.getDate()).padStart(2, '0');
+        const mes = meses[now.getMonth()];
+        const anio = now.getFullYear();
+        dateEl.textContent = `${dia} ${mes} ${anio}`;
+
+        let horas = now.getHours();
+        const minutos = String(now.getMinutes()).padStart(2, '0');
+        const segundos = String(now.getSeconds()).padStart(2, '0');
+        const ampm = horas >= 12 ? 'PM' : 'AM';
+        horas = horas % 12;
+        horas = horas ? horas : 12;
+        const horasStr = String(horas).padStart(2, '0');
+        clockEl.textContent = `${horasStr}:${minutos}:${segundos} ${ampm}`;
     }
-
-    url_activa = urls.get(vista_actual)
-    if url_activa:
-        st.components.v1.iframe(url_activa, height=1000, scrolling=True)
+    setInterval(updateClock, 1000);
+    updateClock();
+</script>
+""", height=0, width=0)
