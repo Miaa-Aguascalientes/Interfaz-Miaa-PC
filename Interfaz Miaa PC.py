@@ -1,8 +1,13 @@
 import base64
+import io
+import math
+import random
 from pathlib import Path
+from PIL import Image, ImageDraw, ImageFilter
 import streamlit as st
 import streamlit.components.v1 as components
 
+# 1. CONFIGURACIÓN DE PÁGINA (EXACTA)
 st.set_page_config(
     page_title="Interfaz Miaa",
     page_icon="https://www.miaa.mx/favicon.ico",
@@ -12,275 +17,687 @@ st.set_page_config(
 
 LOGO_URL = "https://raw.githubusercontent.com/Miaa-Aguascalientes/Logos/38504978c8f77a4dac38ad476f74dbdee6af2cad/LogoMIAA.svg"
 
+# 2. URLS DE TUS SISTEMAS (MODIFICA AQUÍ TUS ENLACES)
+SISTEMAS = [
+    {
+        "id": "scada",
+        "titulo": "SCADA<br>Pozos y Equipos",
+        "titulo_plano": "SCADA Pozos y Equipos",
+        "descripcion": "Monitoreo y control<br>de pozos y equipos",
+        "url": "https://sistema-scada.streamlit.app/",
+        "glow": "#00d4ff",
+        "glow_rgb": "0, 212, 255",
+        "archivo_local": "assets/icon_scada.png"
+    },
+    {
+        "id": "medidores",
+        "titulo": "Medidores<br>Inteligentes",
+        "titulo_plano": "Medidores Inteligentes",
+        "descripcion": "Lecturas y análisis<br>de medidores",
+        "url": "https://lecturas-hes.streamlit.app/",
+        "glow": "#00e5ff",
+        "glow_rgb": "0, 229, 255",
+        "archivo_local": "assets/icon_medidores.png"
+    },
+    {
+        "id": "gis",
+        "titulo": "Mapa y GIS",
+        "titulo_plano": "Mapa y GIS",
+        "descripcion": "Información geográfica<br>y sectorización",
+        "url": "https://miaa-sincronizador-ver-app.streamlit.app/",
+        "glow": "#10b981",
+        "glow_rgb": "16, 185, 129",
+        "archivo_local": "assets/icon_gis.png"
+    },
+    {
+        "id": "mantenimiento",
+        "titulo": "Mantenimiento",
+        "titulo_plano": "Mantenimiento",
+        "descripcion": "Gestión de<br>mantenimiento y fallas",
+        "url": "https://incidencias-miaa.streamlit.app/",
+        "glow": "#f59e0b",
+        "glow_rgb": "245, 158, 11",
+        "archivo_local": "assets/icon_mantenimiento.png"
+    },
+    {
+        "id": "tableros",
+        "titulo": "Tableros y Reportes",
+        "titulo_plano": "Tableros y Reportes",
+        "descripcion": "Indicadores y<br>reportes ejecutivos",
+        "url": "https://tableros-miaa.streamlit.app/",
+        "glow": "#8b5cf6",
+        "glow_rgb": "139, 92, 246",
+        "archivo_local": "assets/icon_tableros.png"
+    },
+    {
+        "id": "hes",
+        "titulo": "HES - Consumo",
+        "titulo_plano": "HES - Consumo",
+        "descripcion": "Lecturas y análisis<br>de consumo",
+        "url": "https://hes-consumo.streamlit.app/",
+        "glow": "#06b6d4",
+        "glow_rgb": "6, 182, 212",
+        "archivo_local": "assets/icon_hes.png"
+    }
+]
 
-def img_b64(ruta: str) -> str:
-    p = Path(ruta)
+
+# 3. GENERADOR DE TEXTURA DE FONDO (OLAS DE AGUA + TANQUE ELEVADO) CON PILLOW
+@st.cache_data(show_spinner=False)
+def obtener_fondo_base64() -> str:
+    ruta_fondo = Path("assets/fondo_miaa.jpg")
+    if ruta_fondo.exists():
+        return f"data:image/jpeg;base64,{base64.b64encode(ruta_fondo.read_bytes()).decode('utf-8')}"
+
+    w, h = 1600, 900
+    img = Image.new("RGB", (w, h), (3, 16, 36))
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    # Cielo nocturno azul profundo con iluminación detrás del tanque elevado
+    for y in range(h):
+        t = y / h
+        r = int(4 + 14 * math.sin(t * math.pi))
+        g = int(20 + 52 * math.sin(t * math.pi))
+        b = int(48 + 95 * math.sin(t * math.pi))
+        draw.line([(0, y), (w, y)], fill=(r, g, b, 255))
+
+    # Halo luminoso detrás del tanque elevado (arriba derecha)
+    halo = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    hdraw = ImageDraw.Draw(halo)
+    hdraw.ellipse((980, -60, 1460, 360), fill=(35, 145, 235, 110))
+    hdraw.ellipse((1060, 10, 1380, 290), fill=(110, 200, 255, 95))
+    halo = halo.filter(ImageFilter.GaussianBlur(45))
+    img.paste(halo, (0, 0), halo)
+
+    # Silueta de árboles en el horizonte derecho
+    rng = random.Random(42)
+    for tx in range(960, 1600, 28):
+        th = rng.randint(45, 95)
+        draw.ellipse((tx - 24, 240 - th, tx + 24, 265), fill=(6, 26, 48, 220))
+
+    # Tanque elevado estilo MIAA en la parte superior derecha
+    cx = 1235
+    # Estructura de soporte (patas y tirantes)
+    patas = [(cx - 56, 130, cx - 68, 250), (cx - 20, 134, cx - 24, 250),
+             (cx + 20, 134, cx + 24, 250), (cx + 56, 130, cx + 68, 250)]
+    for x1, y1, x2, y2 in patas:
+        draw.line([(x1, y1), (x2, y2)], fill=(95, 155, 205, 210), width=5)
+    for y_cross in (170, 210):
+        draw.line([(cx - 62, y_cross), (cx + 62, y_cross)], fill=(80, 140, 190, 180), width=3)
+    draw.line([(cx - 58, 135), (cx - 22, 170)], fill=(80, 140, 190, 150), width=2)
+    draw.line([(cx + 58, 135), (cx + 22, 170)], fill=(80, 140, 190, 150), width=2)
+    draw.line([(cx - 22, 170), (cx + 22, 210)], fill=(80, 140, 190, 150), width=2)
+    draw.line([(cx + 22, 170), (cx - 22, 210)], fill=(80, 140, 190, 150), width=2)
+
+    # Cuerpo cilíndrico del tanque elevado con sombreado 3D
+    draw.ellipse((cx - 78, 34, cx + 78, 62), fill=(115, 175, 225, 235))
+    draw.rectangle((cx - 78, 48, cx + 78, 126), fill=(72, 132, 188, 235))
+    draw.rectangle((cx - 78, 48, cx - 28, 126), fill=(118, 178, 228, 165))
+    draw.ellipse((cx - 78, 112, cx + 78, 140), fill=(52, 106, 160, 240))
+    # Emblema gota en el tanque
+    draw.polygon([(cx, 56), (cx - 10, 72), (cx + 10, 72)], fill=(12, 58, 110, 220))
+    draw.ellipse((cx - 10, 66, cx + 10, 82), fill=(12, 58, 110, 220))
+
+    # Olas de agua dinámicas superiores e inferiores con brillo especular
+    wave_layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    wdraw = ImageDraw.Draw(wave_layer)
+
+    # Ola superior (cresta detrás de las tarjetas superiores)
+    pts_top = [(0, 270)]
+    for x in range(0, w + 20, 20):
+        y = 215 + 32 * math.sin(x * 0.0045) + 14 * math.cos(x * 0.011)
+        pts_top.append((x, y))
+    pts_top.extend([(w, 340), (0, 340)])
+    wdraw.polygon(pts_top, fill=(8, 72, 148, 195))
+
+    # Filo luminoso de espuma en la ola superior
+    crest_top = [(x, 215 + 32 * math.sin(x * 0.0045) + 14 * math.cos(x * 0.011)) for x in range(0, w + 10, 10)]
+    wdraw.line(crest_top, fill=(140, 225, 255, 230), width=5)
+    wdraw.line([(x, y + 6) for x, y in crest_top], fill=(30, 165, 255, 180), width=8)
+
+    # Gotas y salpicaduras sobre la ola superior
+    for _ in range(55):
+        sx = rng.randint(120, 1480)
+        sy = int(175 + 32 * math.sin(sx * 0.0045) + rng.randint(-28, 18))
+        sr = rng.randint(2, 6)
+        wdraw.ellipse((sx - sr, sy - sr, sx + sr, sy + sr), fill=(185, 240, 255, 215))
+
+    # Ola inferior (primer plano abajo de las tarjetas)
+    pts_bot = [(0, h)]
+    for x in range(0, w + 20, 20):
+        y = 755 + 24 * math.sin(x * 0.0052 + 1.2) + 12 * math.cos(x * 0.013)
+        pts_bot.append((x, y))
+    pts_bot.append((w, h))
+    wdraw.polygon(pts_bot, fill=(6, 65, 140, 230))
+
+    crest_bot = [(x, 755 + 24 * math.sin(x * 0.0052 + 1.2) + 12 * math.cos(x * 0.013)) for x in range(0, w + 10, 10)]
+    wdraw.line(crest_bot, fill=(165, 235, 255, 240), width=5)
+    wdraw.line([(x, y + 8) for x, y in crest_bot], fill=(25, 155, 248, 190), width=10)
+
+    # Reflejos internos del agua
+    for i in range(18):
+        rx = rng.randint(40, w - 180)
+        ry = rng.randint(775, 845)
+        rw = rng.randint(70, 190)
+        wdraw.arc((rx, ry, rx + rw, ry + 24), start=190, end=350, fill=(135, 220, 255, 130), width=3)
+
+    wave_blur = wave_layer.filter(ImageFilter.GaussianBlur(1.2))
+    img.paste(wave_blur, (0, 0), wave_blur)
+
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG", quality=90)
+    return f"data:image/jpeg;base64,{base64.b64encode(buf.getvalue()).decode('utf-8')}"
+
+
+# 4. GENERADOR DE MINIATURAS 3D DETALLADAS PARA CADA TARJETA
+@st.cache_data(show_spinner=False)
+def obtener_icono_tarjeta(sys_id: str, ruta_local: str) -> str:
+    p = Path(ruta_local)
     if p.exists():
         ext = p.suffix.lower().lstrip(".")
         if ext == "jpg":
             ext = "jpeg"
         return f"data:image/{ext};base64,{base64.b64encode(p.read_bytes()).decode('utf-8')}"
-    return ""
+
+    w, h = 280, 230
+    img = Image.new("RGBA", (w, h), (6, 24, 48, 255))
+    d = ImageDraw.Draw(img)
+
+    # Fondo con brillo radial interno
+    for r in range(130, 0, -4):
+        alpha = int(120 * (1 - r / 130))
+        d.ellipse((w // 2 - r, h // 2 - r, w // 2 + r, h // 2 + r), fill=(18, 95, 175, alpha))
+
+    if sys_id == "scada":
+        # Monitor SCADA atrás
+        d.rounded_rectangle((96, 22, 254, 118), radius=10, fill=(8, 30, 58, 255), outline=(56, 189, 248, 255), width=3)
+        d.line([(112, 92), (140, 62), (168, 76), (202, 42), (238, 56)], fill=(34, 211, 238, 255), width=4)
+        d.ellipse((197, 37, 207, 47), fill=(255, 255, 255, 255))
+        # Motor eléctrico azul metálico
+        d.rounded_rectangle((28, 96, 152, 172), radius=14, fill=(14, 116, 210, 255), outline=(125, 211, 252, 255), width=3)
+        d.rectangle((36, 102, 144, 122), fill=(56, 189, 248, 170))
+        for rx in range(48, 138, 18):
+            d.line([(rx, 108), (rx, 160)], fill=(5, 32, 66, 255), width=4)
+        # Caracol centrífugo
+        d.ellipse((142, 86, 228, 172), fill=(12, 82, 160, 255), outline=(56, 189, 248, 255), width=4)
+        d.ellipse((166, 110, 204, 148), fill=(6, 26, 52, 255), outline=(186, 230, 253, 255), width=3)
+        d.rectangle((172, 64, 198, 92), fill=(2, 132, 199, 255), outline=(125, 211, 252, 255), width=2)
+        d.rounded_rectangle((20, 174, 244, 190), radius=4, fill=(30, 64, 135, 255))
+
+    elif sys_id == "medidores":
+        # Tubería horizontal azul
+        d.rectangle((16, 108, 264, 146), fill=(3, 105, 161, 255), outline=(56, 189, 248, 255), width=2)
+        d.rounded_rectangle((28, 96, 52, 158), radius=4, fill=(2, 132, 199, 255), outline=(125, 211, 252, 255), width=2)
+        d.rounded_rectangle((228, 96, 252, 158), radius=4, fill=(2, 132, 199, 255), outline=(125, 211, 252, 255), width=2)
+        # Ondas WiFi cian
+        d.arc((102, 14, 178, 72), start=210, end=330, fill=(34, 211, 238, 255), width=5)
+        d.arc((116, 28, 164, 72), start=210, end=330, fill=(34, 211, 238, 255), width=5)
+        # Cuerpo metálico del medidor inteligente
+        d.ellipse((74, 58, 206, 190), fill=(203, 213, 225, 255), outline=(56, 189, 248, 255), width=5)
+        d.ellipse((88, 72, 192, 176), fill=(15, 23, 42, 255), outline=(148, 163, 184, 255), width=3)
+        # Display LCD
+        d.rounded_rectangle((102, 102, 178, 128), radius=4, fill=(186, 230, 253, 255))
+        d.text((112, 109), "000254.7", fill=(7, 89, 133, 255))
+        d.ellipse((132, 140, 148, 156), fill=(239, 68, 68, 255))
+
+    elif sys_id == "gis":
+        # Mapa plegado con relieve
+        d.polygon([(30, 74), (102, 52), (102, 178), (30, 200)], fill=(16, 125, 92, 255), outline=(110, 231, 183, 255))
+        d.polygon([(102, 52), (176, 74), (176, 200), (102, 178)], fill=(11, 98, 74, 255), outline=(110, 231, 183, 255))
+        d.polygon([(176, 74), (248, 52), (248, 178), (176, 200)], fill=(18, 142, 104, 255), outline=(110, 231, 183, 255))
+        # Red de tuberías y sectores
+        d.line([(42, 132), (102, 108), (176, 138), (236, 104)], fill=(56, 189, 248, 255), width=6)
+        d.line([(72, 68), (124, 132), (146, 186)], fill=(253, 224, 71, 220), width=4)
+        # Pin rojo 3D
+        px, py = 176, 62
+        d.polygon([(px - 32, py + 8), (px + 32, py + 8), (px, py + 66)], fill=(220, 38, 38, 255))
+        d.ellipse((px - 34, py - 30, px + 34, py + 36), fill=(239, 68, 68, 255), outline=(255, 255, 255, 255), width=3)
+        d.ellipse((px - 14, py - 10, px + 14, py + 18), fill=(255, 255, 255, 255))
+
+    elif sys_id == "mantenimiento":
+        # Engrane metálico con dientes
+        cx, cy = 126, 116
+        for i in range(10):
+            ang = i * (2 * math.pi / 10)
+            x1 = cx + math.cos(ang) * 44
+            y1 = cy + math.sin(ang) * 44
+            x2 = cx + math.cos(ang) * 64
+            y2 = cy + math.sin(ang) * 64
+            d.line([(x1, y1), (x2, y2)], fill=(203, 213, 225, 255), width=16)
+        d.ellipse((cx - 50, cy - 50, cx + 50, cy + 50), fill=(148, 163, 184, 255), outline=(241, 245, 249, 255), width=3)
+        d.ellipse((cx - 26, cy - 26, cx + 26, cy + 26), fill=(10, 28, 54, 255), outline=(245, 158, 11, 255), width=4)
+        # Llave mecánica cruzada
+        d.line([(68, 174), (206, 52)], fill=(226, 232, 240, 255), width=18)
+        d.ellipse((46, 154), (92, 198), fill=(226, 232, 240, 255))
+        d.ellipse((184, 32), (230, 76), fill=(226, 232, 240, 255))
+        d.ellipse((198, 42), (224, 66), fill=(10, 28, 54, 255))
+
+    elif sys_id == "tableros":
+        # Monitor ejecutivo
+        d.rounded_rectangle((30, 24, 250, 154), radius=12, fill=(10, 25, 50, 255), outline=(96, 165, 250, 255), width=4)
+        d.polygon([(122, 154), (158, 154), (172, 186), (108, 186)], fill=(59, 130, 246, 255))
+        d.rounded_rectangle((88, 186, 192, 196), radius=4, fill=(147, 197, 253, 255))
+        # Gráfica de barras
+        barras = [(52, 110, 138, (56, 189, 248)), (74, 88, 138, (34, 211, 238)),
+                  (96, 98, 138, (129, 140, 248)), (118, 66, 138, (167, 139, 250))]
+        for x1, y1, y2, col in barras:
+            d.rounded_rectangle((x1, y1, x1 + 14, y2), radius=3, fill=col + (255,))
+        # Gráfica de dona
+        d.ellipse((164, 62, 226, 124), outline=(30, 58, 138, 255), width=14)
+        d.arc((164, 62, 226, 124), start=-90, end=145, fill=(0, 212, 255, 255), width=14)
+
+    elif sys_id == "hes":
+        # Casa residencial
+        d.polygon([(118, 34), (42, 98), (58, 98), (58, 182), (178, 182), (178, 98), (194, 98)],
+                  fill=(203, 213, 225, 255), outline=(56, 189, 248, 255))
+        d.polygon([(118, 24), (32, 96), (44, 108), (118, 46), (192, 108), (204, 96)], fill=(2, 132, 199, 255))
+        d.rounded_rectangle((82, 120, 114, 182), radius=3, fill=(15, 23, 42, 255))
+        d.rounded_rectangle((130, 114, 162, 146), radius=3, fill=(15, 23, 42, 255), outline=(56, 189, 248, 255), width=2)
+        # Señal WiFi y Gota de agua 3D
+        d.arc((176, 26, 236, 74), start=210, end=330, fill=(34, 211, 238, 255), width=5)
+        d.arc((188, 38, 224, 74), start=210, end=330, fill=(34, 211, 238, 255), width=5)
+        gx, gy = 206, 146
+        d.polygon([(gx, gy - 54), (gx - 34, gy), (gx + 34, gy)], fill=(14, 165, 233, 255))
+        d.ellipse((gx - 36, gy - 24, gx + 36, gy + 44), fill=(2, 132, 199, 255), outline=(224, 242, 254, 255), width=3)
+        d.arc((gx - 22, gy - 8, gx + 10, gy + 28), start=120, end=220, fill=(255, 255, 255, 210), width=4)
+
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return f"data:image/png;base64,{base64.b64encode(buf.getvalue()).decode('utf-8')}"
 
 
-FONDO_B64 = img_b64("assets/fondo_miaa.jpg")
+FONDO_B64 = obtener_fondo_base64()
+for s in SISTEMAS:
+    s["img_b64"] = obtener_icono_tarjeta(s["id"], s["archivo_local"])
 
-SISTEMAS = [
-    {
-        "titulo": "SCADA<br>Pozos y Equipos",
-        "titulo_plano": "SCADA Pozos y Equipos",
-        "descripcion": "Monitoreo y control de pozos y equipos",
-        "url": "https://sistema-scada.streamlit.app/",
-        "imagen": img_b64("assets/icon_scada.png"),
-        "glow": "#00d4ff",
-        "svg": (
-            '<svg viewBox="0 0 120 100" width="92" height="78" xmlns="http://www.w3.org/2000/svg">'
-            '<rect x="44" y="8" width="66" height="42" rx="5" fill="#071b33" stroke="#38bdf8" stroke-width="2"/>'
-            '<polyline points="50,38 62,25 72,32 86,16 102,23" fill="none" stroke="#22d3ee" stroke-width="2.5"/>'
-            '<rect x="12" y="44" width="50" height="32" rx="6" fill="#0284c7" stroke="#bae6fd" stroke-width="1.5"/>'
-            '<circle cx="78" cy="60" r="18" fill="#0c4a6e" stroke="#38bdf8" stroke-width="2.5"/>'
-            '<circle cx="78" cy="60" r="7" fill="#041324" stroke="#7dd3fc" stroke-width="2"/>'
-            '<rect x="8" y="80" width="96" height="6" rx="2" fill="#1e3a8a"/>'
-            '</svg>'
-        )
-    },
-    {
-        "titulo": "Medidores<br>Inteligentes",
-        "titulo_plano": "Medidores Inteligentes",
-        "descripcion": "Lecturas y análisis de medidores",
-        "url": "https://lecturas-hes.streamlit.app/",
-        "imagen": img_b64("assets/icon_medidores.png"),
-        "glow": "#00e5ff",
-        "svg": (
-            '<svg viewBox="0 0 120 100" width="92" height="78" xmlns="http://www.w3.org/2000/svg">'
-            '<path d="M 44 18 Q 60 6 76 18" fill="none" stroke="#22d3ee" stroke-width="3" stroke-linecap="round"/>'
-            '<path d="M 50 25 Q 60 16 70 25" fill="none" stroke="#22d3ee" stroke-width="3" stroke-linecap="round"/>'
-            '<rect x="10" y="52" width="100" height="16" rx="3" fill="#0284c7" stroke="#38bdf8" stroke-width="1.5"/>'
-            '<circle cx="60" cy="60" r="27" fill="#cbd5e1" stroke="#38bdf8" stroke-width="3"/>'
-            '<circle cx="60" cy="60" r="20" fill="#0f172a" stroke="#7dd3fc" stroke-width="1.5"/>'
-            '<rect x="43" y="50" width="34" height="10" rx="2" fill="#bae6fd"/>'
-            '<text x="60" y="58" font-family="monospace" font-size="7.5" font-weight="bold" fill="#0c4a6e" text-anchor="middle">000254.7</text>'
-            '<circle cx="60" cy="69" r="4" fill="#ef4444"/>'
-            '</svg>'
-        )
-    },
-    {
-        "titulo": "Mapa y GIS",
-        "titulo_plano": "Mapa y GIS",
-        "descripcion": "Información geográfica y sectorización",
-        "url": "https://miaa-sincronizador-ver-app.streamlit.app/",
-        "imagen": img_b64("assets/icon_gis.png"),
-        "glow": "#10b981",
-        "svg": (
-            '<svg viewBox="0 0 120 100" width="92" height="78" xmlns="http://www.w3.org/2000/svg">'
-            '<polygon points="16,36 44,26 44,78 16,88" fill="#065f46" stroke="#34d399" stroke-width="1.5"/>'
-            '<polygon points="44,26 74,36 74,88 44,78" fill="#047857" stroke="#34d399" stroke-width="1.5"/>'
-            '<polygon points="74,36 104,26 104,78 74,88" fill="#059669" stroke="#34d399" stroke-width="1.5"/>'
-            '<polyline points="22,60 44,50 74,63 98,48" fill="none" stroke="#38bdf8" stroke-width="3"/>'
-            '<path d="M 74 10 C 64 10 56 18 56 28 C 56 41 74 56 74 56 C 74 56 92 41 92 28 C 92 18 84 10 74 10 Z" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>'
-            '<circle cx="74" cy="27" r="6" fill="#ffffff"/>'
-            '</svg>'
-        )
-    },
-    {
-        "titulo": "Mantenimiento",
-        "titulo_plano": "Mantenimiento",
-        "descripcion": "Gestión de mantenimiento y fallas",
-        "url": "https://incidencias-miaa.streamlit.app/",
-        "imagen": img_b64("assets/icon_mantenimiento.png"),
-        "glow": "#f59e0b",
-        "svg": (
-            '<svg viewBox="0 0 120 100" width="92" height="78" xmlns="http://www.w3.org/2000/svg">'
-            '<circle cx="54" cy="50" r="22" fill="none" stroke="#cbd5e1" stroke-width="10" stroke-dasharray="10 7"/>'
-            '<circle cx="54" cy="50" r="19" fill="#07192f" stroke="#94a3b8" stroke-width="2"/>'
-            '<circle cx="54" cy="50" r="9" fill="none" stroke="#f59e0b" stroke-width="2.5"/>'
-            '<g transform="rotate(-40 62 50)">'
-            '<rect x="22" y="45" width="80" height="10" rx="3" fill="#e2e8f0" stroke="#1e293b" stroke-width="1.5"/>'
-            '<circle cx="22" cy="50" r="10" fill="#e2e8f0" stroke="#1e293b" stroke-width="1.5"/>'
-            '<circle cx="102" cy="50" r="10" fill="#e2e8f0" stroke="#1e293b" stroke-width="1.5"/>'
-            '</g>'
-            '</svg>'
-        )
-    },
-    {
-        "titulo": "Tableros y Reportes",
-        "titulo_plano": "Tableros y Reportes",
-        "descripcion": "Indicadores y reportes ejecutivos",
-        "url": "https://tableros-miaa.streamlit.app/",
-        "imagen": img_b64("assets/icon_tableros.png"),
-        "glow": "#8b5cf6",
-        "svg": (
-            '<svg viewBox="0 0 120 100" width="92" height="78" xmlns="http://www.w3.org/2000/svg">'
-            '<rect x="16" y="14" width="88" height="52" rx="6" fill="#09182e" stroke="#60a5fa" stroke-width="2.5"/>'
-            '<polygon points="51,66 69,66 75,79 45,79" fill="#3b82f6"/>'
-            '<rect x="38" y="79" width="44" height="5" rx="2" fill="#93c5fd"/>'
-            '<rect x="26" y="46" width="7" height="12" rx="1" fill="#38bdf8"/>'
-            '<rect x="37" y="36" width="7" height="22" rx="1" fill="#22d3ee"/>'
-            '<rect x="48" y="41" width="7" height="17" rx="1" fill="#818cf8"/>'
-            '<rect x="59" y="28" width="7" height="30" rx="1" fill="#a78bfa"/>'
-            '<circle cx="84" cy="41" r="11" fill="none" stroke="#1e3a8a" stroke-width="5"/>'
-            '<circle cx="84" cy="41" r="11" fill="none" stroke="#00d4ff" stroke-width="5" stroke-dasharray="42 28"/>'
-            '</svg>'
-        )
-    },
-    {
-        "titulo": "HES - Consumo",
-        "titulo_plano": "HES - Consumo",
-        "descripcion": "Lecturas y análisis de consumo",
-        "url": "https://hes-consumo.streamlit.app/",
-        "imagen": img_b64("assets/icon_hes.png"),
-        "glow": "#06b6d4",
-        "svg": (
-            '<svg viewBox="0 0 120 100" width="92" height="78" xmlns="http://www.w3.org/2000/svg">'
-            '<polygon points="50,18 16,46 24,46 24,80 76,80 76,46 84,46" fill="#cbd5e1" stroke="#38bdf8" stroke-width="2"/>'
-            '<polygon points="50,14 12,45 18,50 50,23 82,50 88,45" fill="#0284c7"/>'
-            '<rect x="34" y="54" width="12" height="26" rx="2" fill="#0f172a"/>'
-            '<path d="M 78 20 Q 90 10 102 20" fill="none" stroke="#22d3ee" stroke-width="3" stroke-linecap="round"/>'
-            '<path d="M 90 42 C 90 42 75 60 75 72 C 75 81 82 88 90 88 C 98 88 105 81 105 72 C 105 60 90 42 90 42 Z" fill="#0284c7" stroke="#e0f2fe" stroke-width="2"/>'
-            '</svg>'
-        )
-    }
-]
-
-fondo_style = (
-    f"background-image:url('{FONDO_B64}');background-size:cover;background-position:center;background-attachment:fixed;"
-    if FONDO_B64
-    else "background:linear-gradient(180deg,#020b18 0%,#052245 45%,#03152c 100%);"
-)
-
-st.markdown(
-    f'<div style="position:fixed;inset:0;z-index:-1;{fondo_style}"></div>'
-    '<div style="position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse at 75% 18%,rgba(0,180,255,0.22) 0%,transparent 48%),rgba(2,10,22,0.52);"></div>',
-    unsafe_allow_html=True
-)
-
+# 5. BARRA LATERAL NATIVA DE STREAMLIT (SIEMPRE VISIBLE Y FUNCIONAL)
 with st.sidebar:
     st.markdown(
-        f'<div style="text-align:center;padding:8px 0 12px 0;border-bottom:1px solid rgba(56,189,248,0.25);">'
-        f'<img src="{LOGO_URL}" width="150" height="44" style="width:150px;height:44px;object-fit:contain;filter:brightness(0) invert(1);">'
+        f'<div style="text-align:center;padding:8px 0 14px 0;border-bottom:1px solid rgba(56,189,248,0.25);">'
+        f'<img src="{LOGO_URL}" width="155" height="46" style="width:155px;height:46px;object-fit:contain;">'
         f'</div>',
         unsafe_allow_html=True
     )
-    st.markdown("#### Sistemas")
+    st.markdown("### Sistemas MIAA")
     for s in SISTEMAS:
-        st.markdown(
-            f'<div style="margin:6px 0;"><a href="{s["url"]}" target="_blank" '
-            f'style="color:#bae6fd;text-decoration:none;font-size:0.92rem;">• {s["titulo_plano"]}</a></div>',
-            unsafe_allow_html=True
-        )
+        st.markdown(f"- [{s['titulo_plano']}]({s['url']})")
+    st.markdown("---")
+    st.caption("Dirección de Planeación • Subdirección de Tecnología e Innovación")
 
-tank_svg = (
-    '<svg width="74" height="64" viewBox="0 0 90 80" style="width:74px;height:64px;opacity:0.8;" xmlns="http://www.w3.org/2000/svg">'
-    '<path d="M 18 12 Q 45 4 72 12 L 72 36 Q 45 42 18 36 Z" fill="#1e4976" stroke="#7dd3fc" stroke-width="1.5"/>'
-    '<text x="45" y="28" font-family="sans-serif" font-size="11" font-weight="800" fill="#041528" text-anchor="middle">miaa</text>'
-    '<line x1="24" y1="37" x2="20" y2="75" stroke="#7dd3fc" stroke-width="2"/>'
-    '<line x1="37" y1="39" x2="35" y2="75" stroke="#7dd3fc" stroke-width="2"/>'
-    '<line x1="53" y1="39" x2="55" y2="75" stroke="#7dd3fc" stroke-width="2"/>'
-    '<line x1="66" y1="37" x2="70" y2="75" stroke="#7dd3fc" stroke-width="2"/>'
-    '<line x1="22" y1="56" x2="68" y2="56" stroke="#7dd3fc" stroke-width="1.2"/>'
-    '</svg>'
-)
+# 6. CONSTRUCCIÓN DE LAS TARJETAS Y EL PORTAL COMPLETO EN HTML5 PURO
+tarjetas_html = []
+for s in SISTEMAS:
+    tarjetas_html.append(f"""
+    <a class="card" href="{s['url']}" target="_blank" rel="noopener noreferrer"
+       style="--glow:{s['glow']}; --glow-rgb:{s['glow_rgb']};">
+        <div class="card-media">
+            <img src="{s['img_b64']}" alt="{s['titulo_plano']}">
+        </div>
+        <div class="card-content">
+            <div class="card-title">{s['titulo']}</div>
+            <div class="card-desc">{s['descripcion']}</div>
+        </div>
+        <div class="card-arrow">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+        </div>
+    </a>
+    """)
 
-st.markdown(
-    f'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;'
-    f'padding:6px 4px 16px 4px;border-bottom:1px solid rgba(125,211,252,0.22);margin-bottom:20px;">'
-    f'<div style="display:flex;align-items:center;gap:18px;">'
-    f'<img src="{LOGO_URL}" width="175" height="54" alt="MIAA" '
-    f'style="width:175px;height:54px;object-fit:contain;filter:brightness(0) invert(1);">'
-    f'<div style="width:2px;height:46px;background:rgba(255,255,255,0.55);"></div>'
-    f'<div>'
-    f'<div style="font-size:1.5rem;font-weight:700;color:#ffffff;line-height:1.15;">Sistema Integral de Monitoreo</div>'
-    f'<div style="font-size:1.05rem;font-weight:400;color:#bae6fd;margin-top:3px;">Agua Potable para Aguascalientes</div>'
-    f'</div>'
-    f'</div>'
-    f'<div style="display:flex;align-items:center;gap:16px;">'
-    f'{tank_svg}'
-    f'<div style="background:rgba(4,18,38,0.82);border:1px solid rgba(125,211,252,0.35);border-radius:10px;padding:8px 14px;min-width:185px;">'
-    f'<div style="color:#e2e8f0;font-size:0.86rem;margin-bottom:3px;">📅 <span id="live-date">26 Noviembre 2026</span></div>'
-    f'<div style="color:#ffffff;font-size:1.02rem;font-weight:700;">🕒 <span id="live-clock">08:55:00 AM</span></div>'
-    f'</div>'
-    f'</div>'
-    f'</div>',
-    unsafe_allow_html=True
-)
+portal_html = f"""<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    * {{
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }}
+    html, body {{
+        width: 100%;
+        height: 100%;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: #ffffff;
+        background: #020b18 url('{FONDO_B64}') center center / cover no-repeat;
+        overflow-x: hidden;
+    }}
+    .wrapper {{
+        min-height: 760px;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background: linear-gradient(180deg, rgba(2,10,24,0.35) 0%, rgba(2,12,28,0.18) 50%, rgba(2,10,24,0.45) 100%);
+    }}
+    /* HEADER */
+    .topbar {{
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 24px 36px 12px 36px;
+    }}
+    .brand-group {{
+        display: flex;
+        align-items: center;
+        gap: 22px;
+    }}
+    .brand-logo {{
+        height: 68px;
+        width: auto;
+        filter: brightness(0) invert(1) drop-shadow(0 3px 12px rgba(0, 0, 0, 0.65));
+    }}
+    .brand-sep {{
+        width: 2px;
+        height: 54px;
+        background: rgba(255, 255, 255, 0.72);
+    }}
+    .brand-titles h1 {{
+        font-size: 1.65rem;
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: 0.2px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75);
+    }}
+    .brand-titles p {{
+        font-size: 1.18rem;
+        font-weight: 400;
+        color: #cbd5e1;
+        margin-top: 3px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75);
+    }}
+    .clock-widget {{
+        background: rgba(5, 19, 38, 0.68);
+        border: 1px solid rgba(186, 230, 253, 0.32);
+        border-radius: 10px;
+        padding: 10px 18px;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+        min-width: 205px;
+    }}
+    .clock-row {{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.92rem;
+        color: #e2e8f0;
+    }}
+    .clock-row + .clock-row {{
+        margin-top: 6px;
+        font-size: 1.12rem;
+        font-weight: 700;
+        color: #ffffff;
+    }}
+    /* GRID 3x2 */
+    .grid-container {{
+        padding: 10px 36px 20px 36px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 24px;
+        max-width: 1560px;
+        width: 100%;
+        margin: 0 auto;
+    }}
+    @media (max-width: 1080px) {{
+        .grid-container {{
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }}
+        .wrapper {{
+            height: auto;
+        }}
+    }}
+    @media (max-width: 700px) {{
+        .grid-container {{
+            grid-template-columns: 1fr;
+        }}
+    }}
+    .card {{
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        height: 192px;
+        padding: 16px 20px;
+        border-radius: 18px;
+        text-decoration: none;
+        color: #ffffff;
+        background: linear-gradient(135deg, rgba(16, 48, 88, 0.62) 0%, rgba(6, 22, 46, 0.82) 100%);
+        border: 1.5px solid rgba(255, 255, 255, 0.34);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow:
+            0 14px 32px rgba(0, 0, 0, 0.58),
+            inset 0 1px 1px rgba(255, 255, 255, 0.28);
+        overflow: hidden;
+        transition: transform 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease;
+    }}
+    /* Resplandor inferior igual al de la imagen */
+    .card::before {{
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 42px;
+        background: linear-gradient(0deg, rgba(var(--glow-rgb), 0.38) 0%, transparent 100%);
+        pointer-events: none;
+    }}
+    .card::after {{
+        content: "";
+        position: absolute;
+        left: 4%;
+        right: 4%;
+        bottom: 0;
+        height: 4px;
+        background: var(--glow);
+        border-radius: 4px 4px 0 0;
+        box-shadow: 0 -2px 16px var(--glow), 0 0 28px var(--glow);
+    }}
+    .card:hover {{
+        transform: translateY(-6px);
+        border-color: var(--glow);
+        box-shadow:
+            0 18px 38px rgba(0, 0, 0, 0.72),
+            0 0 24px rgba(var(--glow-rgb), 0.45),
+            inset 0 1px 2px rgba(255, 255, 255, 0.38);
+    }}
+    .card-media {{
+        flex: 0 0 156px;
+        width: 156px;
+        height: 152px;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+        z-index: 1;
+    }}
+    .card-media img {{
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }}
+    .card-content {{
+        flex: 1;
+        min-width: 0;
+        z-index: 1;
+    }}
+    .card-title {{
+        font-size: 1.32rem;
+        font-weight: 700;
+        line-height: 1.18;
+        color: #ffffff;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.65);
+    }}
+    .card-desc {{
+        font-size: 0.92rem;
+        font-weight: 400;
+        line-height: 1.32;
+        color: #dbeafe;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
+    }}
+    .card-arrow {{
+        flex: 0 0 36px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 2px solid var(--glow);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        align-self: flex-end;
+        color: #ffffff;
+        background: rgba(3, 14, 30, 0.55);
+        box-shadow: 0 0 12px rgba(var(--glow-rgb), 0.45);
+        z-index: 1;
+        transition: transform 0.2s ease, background 0.2s ease;
+    }}
+    .card:hover .card-arrow {{
+        background: var(--glow);
+        color: #020b18;
+        transform: translateX(3px);
+    }}
+    /* BARRA INFERIOR */
+    .bottombar {{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 11px 36px;
+        background: rgba(3, 14, 30, 0.82);
+        border-top: 1px solid rgba(186, 230, 253, 0.22);
+        backdrop-filter: blur(12px);
+        font-size: 0.9rem;
+        color: #e2e8f0;
+    }}
+    .bottom-left {{
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }}
+    .bars {{
+        display: flex;
+        align-items: flex-end;
+        gap: 3px;
+        height: 15px;
+    }}
+    .bars span {{
+        width: 3.5px;
+        background: #ffffff;
+        border-radius: 1px;
+    }}
+    .bottom-right {{
+        display: flex;
+        align-items: center;
+        gap: 18px;
+    }}
+    .bottom-action {{
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+        opacity: 0.92;
+    }}
+    .bottom-action:hover {{
+        opacity: 1;
+        color: #38bdf8;
+    }}
+    .sep {{
+        color: rgba(255, 255, 255, 0.3);
+    }}
+</style>
+</head>
+<body>
+<div class="wrapper">
+    <header class="topbar">
+        <div class="brand-group">
+            <img class="brand-logo" src="{LOGO_URL}" alt="MIAA">
+            <div class="brand-sep"></div>
+            <div class="brand-titles">
+                <h1>Sistema Integral de Monitoreo</h1>
+                <p>Agua Potable para Aguascalientes</p>
+            </div>
+        </div>
+        <div class="clock-widget">
+            <div class="clock-row">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span id="live-date">26 Noviembre 2026</span>
+            </div>
+            <div class="clock-row">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span id="live-clock">08:57:00 AM</span>
+            </div>
+        </div>
+    </header>
 
-for fila in range(0, len(SISTEMAS), 3):
-    cols = st.columns(3, gap="medium")
-    for idx, col in enumerate(cols):
-        if fila + idx < len(SISTEMAS):
-            item = SISTEMAS[fila + idx]
-            if item["imagen"]:
-                media_html = (
-                    f'<img src="{item["imagen"]}" width="104" height="96" '
-                    f'style="width:104px;height:96px;object-fit:cover;border-radius:10px;">'
-                )
-            else:
-                media_html = item["svg"]
+    <main class="grid-container">
+        {''.join(tarjetas_html)}
+    </main>
 
-            card_html = (
-                f'<a href="{item["url"]}" target="_blank" style="text-decoration:none;display:block;margin-bottom:14px;">'
-                f'<div style="position:relative;display:flex;align-items:center;justify-content:space-between;gap:14px;'
-                f'height:154px;padding:14px 18px;border-radius:16px;'
-                f'background:linear-gradient(145deg,rgba(14,42,78,0.82) 0%,rgba(5,18,36,0.92) 100%);'
-                f'border:1.5px solid rgba(147,197,253,0.35);'
-                f'box-shadow:0 10px 24px rgba(0,0,0,0.55),inset 0 -4px 14px -2px {item["glow"]};overflow:hidden;">'
-                f'<div style="flex:0 0 104px;width:104px;height:104px;display:flex;align-items:center;justify-content:center;'
-                f'background:rgba(3,14,29,0.65);border:1px solid rgba(186,230,253,0.16);border-radius:12px;">'
-                f'{media_html}'
-                f'</div>'
-                f'<div style="flex:1;min-width:0;">'
-                f'<div style="font-size:1.18rem;font-weight:700;color:#ffffff;line-height:1.18;margin-bottom:6px;">{item["titulo"]}</div>'
-                f'<div style="font-size:0.86rem;font-weight:400;color:#cbd5e1;line-height:1.28;">{item["descripcion"]}</div>'
-                f'</div>'
-                f'<div style="flex:0 0 32px;width:32px;height:32px;border-radius:50%;border:2px solid {item["glow"]};'
-                f'display:flex;align-items:center;justify-content:center;color:#ffffff;font-size:0.95rem;font-weight:700;'
-                f'align-self:flex-end;background:rgba(2,11,23,0.6);">&#10095;</div>'
-                f'</div>'
-                f'</a>'
-            )
-            col.markdown(card_html, unsafe_allow_html=True)
+    <footer class="bottombar">
+        <div class="bottom-left">
+            <div class="bars">
+                <span style="height:5px;"></span>
+                <span style="height:8px;"></span>
+                <span style="height:11px;"></span>
+                <span style="height:15px;"></span>
+            </div>
+            <span><strong>MIAA</strong> &nbsp;|&nbsp; Innovación, Tecnología y Agua para Todos</span>
+        </div>
+        <div class="bottom-right">
+            <div class="bottom-action">⚙ Configuración</div>
+            <span class="sep">|</span>
+            <div class="bottom-action">ⓘ Acerca de</div>
+            <span class="sep">|</span>
+            <div class="bottom-action">⏻ Cerrar Sesión</div>
+        </div>
+    </footer>
+</div>
 
-st.markdown(
-    '<div style="margin-top:16px;padding:10px 18px;border-radius:10px;'
-    'background:rgba(2,11,23,0.85);border:1px solid rgba(125,211,252,0.22);'
-    'display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;'
-    'font-size:0.84rem;color:#cbd5e1;">'
-    '<div><strong style="color:#ffffff;">MIAA</strong> &nbsp;|&nbsp; Innovación, Tecnología y Agua para Todos</div>'
-    '<div style="display:flex;gap:14px;">'
-    '<span>⚙️ Configuración</span><span style="opacity:0.35;">|</span>'
-    '<span>ℹ️ Acerca de</span><span style="opacity:0.35;">|</span>'
-    '<span>⏻ Cerrar Sesión</span>'
-    '</div>'
-    '</div>',
-    unsafe_allow_html=True
-)
-
-components.html(
-    """
-    <script>
-    function tick() {
-        const doc = window.parent.document;
-        const dEl = doc.getElementById("live-date");
-        const tEl = doc.getElementById("live-clock");
-        if (!dEl || !tEl) return;
+<script>
+    function updateClock() {{
+        const dateEl = document.getElementById('live-date');
+        const clockEl = document.getElementById('live-clock');
         const now = new Date();
         const meses = [
             "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
             "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
         ];
-        dEl.textContent = String(now.getDate()).padStart(2, "0") + " " + meses[now.getMonth()] + " " + now.getFullYear();
+        const dia = String(now.getDate()).padStart(2, '0');
+        dateEl.textContent = `${{dia}} ${{meses[now.getMonth()]}} ${{now.getFullYear()}}`;
+
         let h = now.getHours();
-        const m = String(now.getMinutes()).padStart(2, "0");
-        const s = String(now.getSeconds()).padStart(2, "0");
-        const ap = h >= 12 ? "PM" : "AM";
+        const m = String(now.getMinutes()).padStart(2, '0');
+        const s = String(now.getSeconds()).padStart(2, '0');
+        const ap = h >= 12 ? 'PM' : 'AM';
         h = h % 12;
         if (h === 0) h = 12;
-        tEl.textContent = String(h).padStart(2, "0") + ":" + m + ":" + s + " " + ap;
-    }
-    setInterval(tick, 1000);
-    tick();
-    </script>
-    """,
-    height=0,
-    width=0
+        clockEl.textContent = `${{String(h).padStart(2, '0')}}:${{m}}:${{s}} ${{ap}}`;
+    }}
+    setInterval(updateClock, 1000);
+    updateClock();
+</script>
+</body>
+</html>
+"""
+
+# Quitar márgenes superiores de Streamlit alrededor del componente sin tocar la sidebar
+st.markdown(
+    '<style>.block-container{padding:0 !important;max-width:100% !important;}'
+    'iframe{display:block;border:none;}</style>',
+    unsafe_allow_html=True
 )
+
+components.html(portal_html, height=780, scrolling=False)
