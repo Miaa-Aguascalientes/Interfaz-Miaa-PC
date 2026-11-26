@@ -13,266 +13,242 @@ st.set_page_config(
 LOGO_URL = "https://raw.githubusercontent.com/Miaa-Aguascalientes/Logos/38504978c8f77a4dac38ad476f74dbdee6af2cad/LogoMIAA.svg"
 
 
-def img_to_base64(ruta: str) -> str:
-    archivo = Path(ruta)
-    if archivo.exists():
-        ext = archivo.suffix.lower().replace(".", "")
+def img_b64(ruta: str) -> str:
+    p = Path(ruta)
+    if p.exists():
+        ext = p.suffix.lower().lstrip(".")
         if ext == "jpg":
             ext = "jpeg"
-        data = base64.b64encode(archivo.read_bytes()).decode("utf-8")
-        return f"data:image/{ext};base64,{data}"
+        return f"data:image/{ext};base64,{base64.b64encode(p.read_bytes()).decode('utf-8')}"
     return ""
 
 
-FONDO_B64 = img_to_base64("assets/fondo_miaa.jpg")
+FONDO_B64 = img_b64("assets/fondo_miaa.jpg")
 
 SISTEMAS = [
     {
         "titulo": "SCADA<br>Pozos y Equipos",
+        "titulo_plano": "SCADA Pozos y Equipos",
         "descripcion": "Monitoreo y control de pozos y equipos",
         "url": "https://sistema-scada.streamlit.app/",
-        "imagen": img_to_base64("assets/icon_scada.png"),
+        "imagen": img_b64("assets/icon_scada.png"),
         "glow": "#00d4ff",
-        "glow_rgba": "rgba(0, 212, 255, 0.75)"
+        "svg": (
+            '<svg viewBox="0 0 120 100" width="92" height="78" xmlns="http://www.w3.org/2000/svg">'
+            '<rect x="44" y="8" width="66" height="42" rx="5" fill="#071b33" stroke="#38bdf8" stroke-width="2"/>'
+            '<polyline points="50,38 62,25 72,32 86,16 102,23" fill="none" stroke="#22d3ee" stroke-width="2.5"/>'
+            '<rect x="12" y="44" width="50" height="32" rx="6" fill="#0284c7" stroke="#bae6fd" stroke-width="1.5"/>'
+            '<circle cx="78" cy="60" r="18" fill="#0c4a6e" stroke="#38bdf8" stroke-width="2.5"/>'
+            '<circle cx="78" cy="60" r="7" fill="#041324" stroke="#7dd3fc" stroke-width="2"/>'
+            '<rect x="8" y="80" width="96" height="6" rx="2" fill="#1e3a8a"/>'
+            '</svg>'
+        )
     },
     {
         "titulo": "Medidores<br>Inteligentes",
+        "titulo_plano": "Medidores Inteligentes",
         "descripcion": "Lecturas y análisis de medidores",
         "url": "https://lecturas-hes.streamlit.app/",
-        "imagen": img_to_base64("assets/icon_medidores.png"),
+        "imagen": img_b64("assets/icon_medidores.png"),
         "glow": "#00e5ff",
-        "glow_rgba": "rgba(0, 229, 255, 0.75)"
+        "svg": (
+            '<svg viewBox="0 0 120 100" width="92" height="78" xmlns="http://www.w3.org/2000/svg">'
+            '<path d="M 44 18 Q 60 6 76 18" fill="none" stroke="#22d3ee" stroke-width="3" stroke-linecap="round"/>'
+            '<path d="M 50 25 Q 60 16 70 25" fill="none" stroke="#22d3ee" stroke-width="3" stroke-linecap="round"/>'
+            '<rect x="10" y="52" width="100" height="16" rx="3" fill="#0284c7" stroke="#38bdf8" stroke-width="1.5"/>'
+            '<circle cx="60" cy="60" r="27" fill="#cbd5e1" stroke="#38bdf8" stroke-width="3"/>'
+            '<circle cx="60" cy="60" r="20" fill="#0f172a" stroke="#7dd3fc" stroke-width="1.5"/>'
+            '<rect x="43" y="50" width="34" height="10" rx="2" fill="#bae6fd"/>'
+            '<text x="60" y="58" font-family="monospace" font-size="7.5" font-weight="bold" fill="#0c4a6e" text-anchor="middle">000254.7</text>'
+            '<circle cx="60" cy="69" r="4" fill="#ef4444"/>'
+            '</svg>'
+        )
     },
     {
         "titulo": "Mapa y GIS",
+        "titulo_plano": "Mapa y GIS",
         "descripcion": "Información geográfica y sectorización",
         "url": "https://miaa-sincronizador-ver-app.streamlit.app/",
-        "imagen": img_to_base64("assets/icon_gis.png"),
+        "imagen": img_b64("assets/icon_gis.png"),
         "glow": "#10b981",
-        "glow_rgba": "rgba(16, 185, 129, 0.75)"
+        "svg": (
+            '<svg viewBox="0 0 120 100" width="92" height="78" xmlns="http://www.w3.org/2000/svg">'
+            '<polygon points="16,36 44,26 44,78 16,88" fill="#065f46" stroke="#34d399" stroke-width="1.5"/>'
+            '<polygon points="44,26 74,36 74,88 44,78" fill="#047857" stroke="#34d399" stroke-width="1.5"/>'
+            '<polygon points="74,36 104,26 104,78 74,88" fill="#059669" stroke="#34d399" stroke-width="1.5"/>'
+            '<polyline points="22,60 44,50 74,63 98,48" fill="none" stroke="#38bdf8" stroke-width="3"/>'
+            '<path d="M 74 10 C 64 10 56 18 56 28 C 56 41 74 56 74 56 C 74 56 92 41 92 28 C 92 18 84 10 74 10 Z" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>'
+            '<circle cx="74" cy="27" r="6" fill="#ffffff"/>'
+            '</svg>'
+        )
     },
     {
         "titulo": "Mantenimiento",
+        "titulo_plano": "Mantenimiento",
         "descripcion": "Gestión de mantenimiento y fallas",
         "url": "https://incidencias-miaa.streamlit.app/",
-        "imagen": img_to_base64("assets/icon_mantenimiento.png"),
+        "imagen": img_b64("assets/icon_mantenimiento.png"),
         "glow": "#f59e0b",
-        "glow_rgba": "rgba(245, 158, 11, 0.75)"
+        "svg": (
+            '<svg viewBox="0 0 120 100" width="92" height="78" xmlns="http://www.w3.org/2000/svg">'
+            '<circle cx="54" cy="50" r="22" fill="none" stroke="#cbd5e1" stroke-width="10" stroke-dasharray="10 7"/>'
+            '<circle cx="54" cy="50" r="19" fill="#07192f" stroke="#94a3b8" stroke-width="2"/>'
+            '<circle cx="54" cy="50" r="9" fill="none" stroke="#f59e0b" stroke-width="2.5"/>'
+            '<g transform="rotate(-40 62 50)">'
+            '<rect x="22" y="45" width="80" height="10" rx="3" fill="#e2e8f0" stroke="#1e293b" stroke-width="1.5"/>'
+            '<circle cx="22" cy="50" r="10" fill="#e2e8f0" stroke="#1e293b" stroke-width="1.5"/>'
+            '<circle cx="102" cy="50" r="10" fill="#e2e8f0" stroke="#1e293b" stroke-width="1.5"/>'
+            '</g>'
+            '</svg>'
+        )
     },
     {
         "titulo": "Tableros y Reportes",
+        "titulo_plano": "Tableros y Reportes",
         "descripcion": "Indicadores y reportes ejecutivos",
         "url": "https://tableros-miaa.streamlit.app/",
-        "imagen": img_to_base64("assets/icon_tableros.png"),
+        "imagen": img_b64("assets/icon_tableros.png"),
         "glow": "#8b5cf6",
-        "glow_rgba": "rgba(139, 92, 246, 0.75)"
+        "svg": (
+            '<svg viewBox="0 0 120 100" width="92" height="78" xmlns="http://www.w3.org/2000/svg">'
+            '<rect x="16" y="14" width="88" height="52" rx="6" fill="#09182e" stroke="#60a5fa" stroke-width="2.5"/>'
+            '<polygon points="51,66 69,66 75,79 45,79" fill="#3b82f6"/>'
+            '<rect x="38" y="79" width="44" height="5" rx="2" fill="#93c5fd"/>'
+            '<rect x="26" y="46" width="7" height="12" rx="1" fill="#38bdf8"/>'
+            '<rect x="37" y="36" width="7" height="22" rx="1" fill="#22d3ee"/>'
+            '<rect x="48" y="41" width="7" height="17" rx="1" fill="#818cf8"/>'
+            '<rect x="59" y="28" width="7" height="30" rx="1" fill="#a78bfa"/>'
+            '<circle cx="84" cy="41" r="11" fill="none" stroke="#1e3a8a" stroke-width="5"/>'
+            '<circle cx="84" cy="41" r="11" fill="none" stroke="#00d4ff" stroke-width="5" stroke-dasharray="42 28"/>'
+            '</svg>'
+        )
     },
     {
         "titulo": "HES - Consumo",
+        "titulo_plano": "HES - Consumo",
         "descripcion": "Lecturas y análisis de consumo",
         "url": "https://hes-consumo.streamlit.app/",
-        "imagen": img_to_base64("assets/icon_hes.png"),
+        "imagen": img_b64("assets/icon_hes.png"),
         "glow": "#06b6d4",
-        "glow_rgba": "rgba(6, 182, 212, 0.75)"
+        "svg": (
+            '<svg viewBox="0 0 120 100" width="92" height="78" xmlns="http://www.w3.org/2000/svg">'
+            '<polygon points="50,18 16,46 24,46 24,80 76,80 76,46 84,46" fill="#cbd5e1" stroke="#38bdf8" stroke-width="2"/>'
+            '<polygon points="50,14 12,45 18,50 50,23 82,50 88,45" fill="#0284c7"/>'
+            '<rect x="34" y="54" width="12" height="26" rx="2" fill="#0f172a"/>'
+            '<path d="M 78 20 Q 90 10 102 20" fill="none" stroke="#22d3ee" stroke-width="3" stroke-linecap="round"/>'
+            '<path d="M 90 42 C 90 42 75 60 75 72 C 75 81 82 88 90 88 C 98 88 105 81 105 72 C 105 60 90 42 90 42 Z" fill="#0284c7" stroke="#e0f2fe" stroke-width="2"/>'
+            '</svg>'
+        )
     }
 ]
 
-fondo_css = (
-    f'url("{FONDO_B64}") center center / cover no-repeat fixed'
+fondo_style = (
+    f"background-image:url('{FONDO_B64}');background-size:cover;background-position:center;background-attachment:fixed;"
     if FONDO_B64
-    else 'radial-gradient(ellipse at 75% 20%, rgba(0, 174, 255, 0.35) 0%, transparent 45%), linear-gradient(180deg, #020b18 0%, #05264d 45%, #020d1f 100%)'
+    else "background:linear-gradient(180deg,#020b18 0%,#052245 45%,#03152c 100%);"
 )
 
 st.markdown(
-    f'<style>'
-    "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');"
-    '[data-testid="stHeader"] {{background: transparent !important;}}'
-    '[data-testid="stDecoration"] {{display: none !important;}}'
-    '#MainMenu, footer {{visibility: hidden;}}'
-    '[data-testid="stSidebar"] {{'
-    '  background: linear-gradient(180deg, #031124 0%, #051f3f 100%) !important;'
-    '  border-right: 1px solid rgba(0, 212, 255, 0.25) !important;'
-    '}}'
-    '.stApp {{'
-    f'  background: {fondo_css};'
-    '  font-family: "Inter", sans-serif;'
-    '  color: #ffffff;'
-    '}}'
-    '.block-container {{'
-    '  padding-top: 0.6rem !important;'
-    '  padding-bottom: 4rem !important;'
-    '  padding-left: 2rem !important;'
-    '  padding-right: 2rem !important;'
-    '  max-width: 1520px;'
-    '}}'
-    '.miaa-header-bar {{'
-    '  display: flex;'
-    '  justify-content: space-between;'
-    '  align-items: center;'
-    '  padding: 6px 4px 18px 4px;'
-    '  margin-bottom: 18px;'
-    '}}'
-    '.miaa-brand-wrap {{display: flex; align-items: center; gap: 22px;}}'
-    '.miaa-brand-wrap img {{height: 64px; width: auto; filter: brightness(0) invert(1) drop-shadow(0 2px 10px rgba(0,0,0,0.65));}}'
-    '.miaa-divider {{width: 2px; height: 52px; background: rgba(255,255,255,0.75);}}'
-    '.miaa-heading h1 {{margin: 0; font-size: 1.65rem; font-weight: 700; color: #ffffff; text-shadow: 0 2px 8px rgba(0,0,0,0.75);}}'
-    '.miaa-heading p {{margin: 4px 0 0 0; font-size: 1.15rem; font-weight: 400; color: #cbd5e1; text-shadow: 0 2px 8px rgba(0,0,0,0.75);}}'
-    '.miaa-clock-box {{'
-    '  background: rgba(4, 18, 38, 0.72);'
-    '  border: 1px solid rgba(148, 163, 184, 0.35);'
-    '  border-radius: 10px;'
-    '  padding: 10px 18px;'
-    '  backdrop-filter: blur(10px);'
-    '  min-width: 195px;'
-    '}}'
-    '.miaa-clock-line {{display: flex; align-items: center; gap: 9px; font-size: 0.9rem; color: #e2e8f0; margin-bottom: 4px;}}'
-    '.miaa-clock-line:last-child {{margin-bottom: 0; font-size: 1.1rem; font-weight: 700; color: #ffffff;}}'
-    '.miaa-cards-grid {{'
-    '  display: grid;'
-    '  grid-template-columns: repeat(3, minmax(0, 1fr));'
-    '  gap: 22px;'
-    '}}'
-    '@media (max-width: 1120px) {{.miaa-cards-grid {{grid-template-columns: repeat(2, minmax(0, 1fr));}}}}'
-    '@media (max-width: 740px) {{.miaa-cards-grid {{grid-template-columns: 1fr;}}}}'
-    '.miaa-module-card {{'
-    '  position: relative;'
-    '  display: grid;'
-    '  grid-template-columns: 138px 1fr 36px;'
-    '  align-items: center;'
-    '  gap: 16px;'
-    '  height: 176px;'
-    '  padding: 16px 20px;'
-    '  border-radius: 18px;'
-    '  background: linear-gradient(135deg, rgba(16, 46, 84, 0.62) 0%, rgba(5, 19, 39, 0.82) 100%);'
-    '  border: 1.5px solid rgba(255, 255, 255, 0.28);'
-    '  backdrop-filter: blur(14px);'
-    '  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.25);'
-    '  overflow: hidden;'
-    '  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;'
-    '}}'
-    '.miaa-module-card::after {{'
-    '  content: "";'
-    '  position: absolute;'
-    '  bottom: 0;'
-    '  left: 5%;'
-    '  right: 5%;'
-    '  height: 5px;'
-    '  background: var(--g);'
-    '  border-radius: 5px 5px 0 0;'
-    '  box-shadow: 0 -3px 16px var(--gr), 0 0 26px var(--gr);'
-    '}}'
-    '.miaa-module-card:hover {{'
-    '  transform: translateY(-5px);'
-    '  border-color: var(--g);'
-    '  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75), 0 0 22px var(--gr);'
-    '}}'
-    '.miaa-module-overlay {{position: absolute; inset: 0; z-index: 5; text-decoration: none !important;}}'
-    '.miaa-module-thumb {{'
-    '  width: 138px;'
-    '  height: 134px;'
-    '  border-radius: 12px;'
-    '  overflow: hidden;'
-    '  display: flex;'
-    '  align-items: center;'
-    '  justify-content: center;'
-    '  background: rgba(3, 14, 30, 0.55);'
-    '  border: 1px solid rgba(255, 255, 255, 0.14);'
-    '}}'
-    '.miaa-module-thumb img {{width: 100%; height: 100%; object-fit: cover;}}'
-    '.miaa-module-info {{min-width: 0;}}'
-    '.miaa-module-title {{font-size: 1.28rem; font-weight: 700; color: #ffffff; line-height: 1.18; margin-bottom: 8px; text-shadow: 0 2px 6px rgba(0,0,0,0.65);}}'
-    '.miaa-module-desc {{font-size: 0.9rem; font-weight: 400; color: #e2e8f0; line-height: 1.3;}}'
-    '.miaa-module-next {{'
-    '  width: 34px;'
-    '  height: 34px;'
-    '  border-radius: 50%;'
-    '  border: 2px solid var(--g);'
-    '  display: flex;'
-    '  align-items: center;'
-    '  justify-content: center;'
-    '  color: #ffffff;'
-    '  font-size: 1rem;'
-    '  font-weight: 700;'
-    '  align-self: end;'
-    '  background: rgba(2, 11, 23, 0.55);'
-    '}}'
-    '.miaa-footer-bar {{'
-    '  position: fixed;'
-    '  bottom: 0;'
-    '  left: 0;'
-    '  right: 0;'
-    '  height: 40px;'
-    '  background: rgba(2, 11, 23, 0.9);'
-    '  border-top: 1px solid rgba(125, 211, 252, 0.25);'
-    '  display: flex;'
-    '  justify-content: space-between;'
-    '  align-items: center;'
-    '  padding: 0 24px;'
-    '  padding-right: 175px;'
-    '  z-index: 980;'
-    '  font-size: 0.84rem;'
-    '  color: #e2e8f0;'
-    '}}'
-    '</style>',
+    f'<div style="position:fixed;inset:0;z-index:-1;{fondo_style}"></div>'
+    '<div style="position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse at 75% 18%,rgba(0,180,255,0.22) 0%,transparent 48%),rgba(2,10,22,0.52);"></div>',
     unsafe_allow_html=True
 )
 
 with st.sidebar:
     st.markdown(
-        f'<div style="text-align:center;padding:8px 0 14px 0;">'
-        f'<img src="{LOGO_URL}" style="height:42px;filter:brightness(0) invert(1);">'
+        f'<div style="text-align:center;padding:8px 0 12px 0;border-bottom:1px solid rgba(56,189,248,0.25);">'
+        f'<img src="{LOGO_URL}" width="150" height="44" style="width:150px;height:44px;object-fit:contain;filter:brightness(0) invert(1);">'
         f'</div>',
         unsafe_allow_html=True
     )
-    st.markdown("### Sistemas")
+    st.markdown("#### Sistemas")
     for s in SISTEMAS:
-        st.page_link(s["url"], label=s["titulo"].replace("<br>", " "))
+        st.markdown(
+            f'<div style="margin:6px 0;"><a href="{s["url"]}" target="_blank" '
+            f'style="color:#bae6fd;text-decoration:none;font-size:0.92rem;">• {s["titulo_plano"]}</a></div>',
+            unsafe_allow_html=True
+        )
+
+tank_svg = (
+    '<svg width="74" height="64" viewBox="0 0 90 80" style="width:74px;height:64px;opacity:0.8;" xmlns="http://www.w3.org/2000/svg">'
+    '<path d="M 18 12 Q 45 4 72 12 L 72 36 Q 45 42 18 36 Z" fill="#1e4976" stroke="#7dd3fc" stroke-width="1.5"/>'
+    '<text x="45" y="28" font-family="sans-serif" font-size="11" font-weight="800" fill="#041528" text-anchor="middle">miaa</text>'
+    '<line x1="24" y1="37" x2="20" y2="75" stroke="#7dd3fc" stroke-width="2"/>'
+    '<line x1="37" y1="39" x2="35" y2="75" stroke="#7dd3fc" stroke-width="2"/>'
+    '<line x1="53" y1="39" x2="55" y2="75" stroke="#7dd3fc" stroke-width="2"/>'
+    '<line x1="66" y1="37" x2="70" y2="75" stroke="#7dd3fc" stroke-width="2"/>'
+    '<line x1="22" y1="56" x2="68" y2="56" stroke="#7dd3fc" stroke-width="1.2"/>'
+    '</svg>'
+)
 
 st.markdown(
-    '<div class="miaa-header-bar">'
-    '<div class="miaa-brand-wrap">'
-    f'<img src="{LOGO_URL}" alt="MIAA">'
-    '<div class="miaa-divider"></div>'
-    '<div class="miaa-heading">'
-    '<h1>Sistema Integral de Monitoreo</h1>'
-    '<p>Agua Potable para Aguascalientes</p>'
-    '</div>'
-    '</div>'
-    '<div class="miaa-clock-box">'
-    '<div class="miaa-clock-line"><span>📅</span><span id="live-date">26 Noviembre 2026</span></div>'
-    '<div class="miaa-clock-line"><span>🕒</span><span id="live-clock">08:54:00 AM</span></div>'
-    '</div>'
-    '</div>',
+    f'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;'
+    f'padding:6px 4px 16px 4px;border-bottom:1px solid rgba(125,211,252,0.22);margin-bottom:20px;">'
+    f'<div style="display:flex;align-items:center;gap:18px;">'
+    f'<img src="{LOGO_URL}" width="175" height="54" alt="MIAA" '
+    f'style="width:175px;height:54px;object-fit:contain;filter:brightness(0) invert(1);">'
+    f'<div style="width:2px;height:46px;background:rgba(255,255,255,0.55);"></div>'
+    f'<div>'
+    f'<div style="font-size:1.5rem;font-weight:700;color:#ffffff;line-height:1.15;">Sistema Integral de Monitoreo</div>'
+    f'<div style="font-size:1.05rem;font-weight:400;color:#bae6fd;margin-top:3px;">Agua Potable para Aguascalientes</div>'
+    f'</div>'
+    f'</div>'
+    f'<div style="display:flex;align-items:center;gap:16px;">'
+    f'{tank_svg}'
+    f'<div style="background:rgba(4,18,38,0.82);border:1px solid rgba(125,211,252,0.35);border-radius:10px;padding:8px 14px;min-width:185px;">'
+    f'<div style="color:#e2e8f0;font-size:0.86rem;margin-bottom:3px;">📅 <span id="live-date">26 Noviembre 2026</span></div>'
+    f'<div style="color:#ffffff;font-size:1.02rem;font-weight:700;">🕒 <span id="live-clock">08:55:00 AM</span></div>'
+    f'</div>'
+    f'</div>'
+    f'</div>',
     unsafe_allow_html=True
 )
 
-cards_html = ['<div class="miaa-cards-grid">']
-for item in SISTEMAS:
-    thumb_content = (
-        f'<img src="{item["imagen"]}" alt="{item["titulo"].replace("<br>", " ")}">'
-        if item["imagen"]
-        else '<span style="color:#7dd3fc;font-size:0.75rem;text-align:center;padding:6px;">Coloca imagen en assets/</span>'
-    )
-    cards_html.append(
-        f'<div class="miaa-module-card" style="--g:{item["glow"]};--gr:{item["glow_rgba"]};">'
-        f'<a class="miaa-module-overlay" href="{item["url"]}" target="_blank"></a>'
-        f'<div class="miaa-module-thumb">{thumb_content}</div>'
-        f'<div class="miaa-module-info">'
-        f'<div class="miaa-module-title">{item["titulo"]}</div>'
-        f'<div class="miaa-module-desc">{item["descripcion"]}</div>'
-        f'</div>'
-        f'<div class="miaa-module-next">&#10095;</div>'
-        f'</div>'
-    )
-cards_html.append('</div>')
-st.markdown("".join(cards_html), unsafe_allow_html=True)
+for fila in range(0, len(SISTEMAS), 3):
+    cols = st.columns(3, gap="medium")
+    for idx, col in enumerate(cols):
+        if fila + idx < len(SISTEMAS):
+            item = SISTEMAS[fila + idx]
+            if item["imagen"]:
+                media_html = (
+                    f'<img src="{item["imagen"]}" width="104" height="96" '
+                    f'style="width:104px;height:96px;object-fit:cover;border-radius:10px;">'
+                )
+            else:
+                media_html = item["svg"]
+
+            card_html = (
+                f'<a href="{item["url"]}" target="_blank" style="text-decoration:none;display:block;margin-bottom:14px;">'
+                f'<div style="position:relative;display:flex;align-items:center;justify-content:space-between;gap:14px;'
+                f'height:154px;padding:14px 18px;border-radius:16px;'
+                f'background:linear-gradient(145deg,rgba(14,42,78,0.82) 0%,rgba(5,18,36,0.92) 100%);'
+                f'border:1.5px solid rgba(147,197,253,0.35);'
+                f'box-shadow:0 10px 24px rgba(0,0,0,0.55),inset 0 -4px 14px -2px {item["glow"]};overflow:hidden;">'
+                f'<div style="flex:0 0 104px;width:104px;height:104px;display:flex;align-items:center;justify-content:center;'
+                f'background:rgba(3,14,29,0.65);border:1px solid rgba(186,230,253,0.16);border-radius:12px;">'
+                f'{media_html}'
+                f'</div>'
+                f'<div style="flex:1;min-width:0;">'
+                f'<div style="font-size:1.18rem;font-weight:700;color:#ffffff;line-height:1.18;margin-bottom:6px;">{item["titulo"]}</div>'
+                f'<div style="font-size:0.86rem;font-weight:400;color:#cbd5e1;line-height:1.28;">{item["descripcion"]}</div>'
+                f'</div>'
+                f'<div style="flex:0 0 32px;width:32px;height:32px;border-radius:50%;border:2px solid {item["glow"]};'
+                f'display:flex;align-items:center;justify-content:center;color:#ffffff;font-size:0.95rem;font-weight:700;'
+                f'align-self:flex-end;background:rgba(2,11,23,0.6);">&#10095;</div>'
+                f'</div>'
+                f'</a>'
+            )
+            col.markdown(card_html, unsafe_allow_html=True)
 
 st.markdown(
-    '<div class="miaa-footer-bar">'
-    '<div><strong>MIAA</strong> &nbsp;|&nbsp; Innovación, Tecnología y Agua para Todos</div>'
+    '<div style="margin-top:16px;padding:10px 18px;border-radius:10px;'
+    'background:rgba(2,11,23,0.85);border:1px solid rgba(125,211,252,0.22);'
+    'display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;'
+    'font-size:0.84rem;color:#cbd5e1;">'
+    '<div><strong style="color:#ffffff;">MIAA</strong> &nbsp;|&nbsp; Innovación, Tecnología y Agua para Todos</div>'
     '<div style="display:flex;gap:14px;">'
-    '<span>⚙️ Configuración</span><span>|</span>'
-    '<span>ℹ️ Acerca de</span><span>|</span>'
+    '<span>⚙️ Configuración</span><span style="opacity:0.35;">|</span>'
+    '<span>ℹ️ Acerca de</span><span style="opacity:0.35;">|</span>'
     '<span>⏻ Cerrar Sesión</span>'
     '</div>'
     '</div>',
