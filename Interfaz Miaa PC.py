@@ -286,6 +286,39 @@ FONDO_B64 = obtener_fondo_base64()
 for s in SISTEMAS:
     s["img_b64"] = obtener_icono_tarjeta(s["id"], s["archivo_local"])
 
+# Limpiar franjas grises de Streamlit sin ocultar el botón de la barra lateral
+st.markdown(
+    """
+    <style>
+        [data-testid="stHeader"] {
+            background: rgba(2, 11, 24, 0.35) !important;
+            height: 2.2rem !important;
+        }
+        [data-testid="stAppViewContainer"],
+        .stApp,
+        .main,
+        [data-testid="block-container"] {
+            background: #020b18 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+        }
+        [data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #031124 0%, #051f3f 100%) !important;
+            border-right: 1px solid rgba(56, 189, 248, 0.25) !important;
+        }
+        iframe {
+            display: block !important;
+            width: 100% !important;
+            border: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 with st.sidebar:
     st.markdown(
         f'<div style="text-align:center;padding:8px 0 14px 0;border-bottom:1px solid rgba(56,189,248,0.25);">'
@@ -337,103 +370,90 @@ portal_html = f"""<!DOCTYPE html>
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         color: #ffffff;
         background: #020b18 url('{FONDO_B64}') center center / cover no-repeat;
-        overflow-x: hidden;
+        overflow: hidden;
     }}
     .wrapper {{
-        min-height: 760px;
+        width: 100%;
         height: 100vh;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        background: linear-gradient(180deg, rgba(2,10,24,0.35) 0%, rgba(2,12,28,0.18) 50%, rgba(2,10,24,0.45) 100%);
+        background: linear-gradient(180deg, rgba(2,10,24,0.28) 0%, rgba(2,12,28,0.14) 50%, rgba(2,10,24,0.38) 100%);
     }}
     .topbar {{
         display: flex;
         justify-content: space-between;
-        align-items: flex-start;
-        padding: 24px 36px 12px 36px;
+        align-items: center;
+        padding: 12px 32px 6px 32px;
     }}
     .brand-group {{
         display: flex;
         align-items: center;
-        gap: 22px;
+        gap: 20px;
     }}
     .brand-logo {{
-        height: 68px;
+        height: 58px;
         width: auto;
-        filter: brightness(0) invert(1) drop-shadow(0 3px 12px rgba(0, 0, 0, 0.65));
+        filter: brightness(0) invert(1) drop-shadow(0 3px 10px rgba(0, 0, 0, 0.65));
     }}
     .brand-sep {{
         width: 2px;
-        height: 54px;
+        height: 48px;
         background: rgba(255, 255, 255, 0.72);
     }}
     .brand-titles h1 {{
-        font-size: 1.65rem;
+        font-size: 1.5rem;
         font-weight: 700;
         color: #ffffff;
         letter-spacing: 0.2px;
         text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75);
     }}
     .brand-titles p {{
-        font-size: 1.18rem;
+        font-size: 1.08rem;
         font-weight: 400;
         color: #cbd5e1;
-        margin-top: 3px;
+        margin-top: 2px;
         text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75);
     }}
     .clock-widget {{
         background: rgba(5, 19, 38, 0.68);
         border: 1px solid rgba(186, 230, 253, 0.32);
         border-radius: 10px;
-        padding: 10px 18px;
+        padding: 8px 16px;
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-        min-width: 205px;
+        min-width: 195px;
     }}
     .clock-row {{
         display: flex;
         align-items: center;
-        gap: 10px;
-        font-size: 0.92rem;
+        gap: 9px;
+        font-size: 0.88rem;
         color: #e2e8f0;
     }}
     .clock-row + .clock-row {{
-        margin-top: 6px;
-        font-size: 1.12rem;
+        margin-top: 4px;
+        font-size: 1.05rem;
         font-weight: 700;
         color: #ffffff;
     }}
     .grid-container {{
-        padding: 10px 36px 20px 36px;
+        padding: 6px 32px;
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 24px;
+        gap: 20px;
         max-width: 1560px;
         width: 100%;
         margin: 0 auto;
-    }}
-    @media (max-width: 1080px) {{
-        .grid-container {{
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }}
-        .wrapper {{
-            height: auto;
-        }}
-    }}
-    @media (max-width: 700px) {{
-        .grid-container {{
-            grid-template-columns: 1fr;
-        }}
     }}
     .card {{
         position: relative;
         display: flex;
         align-items: center;
-        gap: 18px;
-        height: 192px;
-        padding: 16px 20px;
+        gap: 16px;
+        height: 176px;
+        padding: 14px 18px;
         border-radius: 18px;
         text-decoration: none;
         color: #ffffff;
@@ -453,7 +473,7 @@ portal_html = f"""<!DOCTYPE html>
         left: 0;
         right: 0;
         bottom: 0;
-        height: 42px;
+        height: 40px;
         background: linear-gradient(0deg, rgba(var(--glow-rgb), 0.38) 0%, transparent 100%);
         pointer-events: none;
     }}
@@ -469,7 +489,7 @@ portal_html = f"""<!DOCTYPE html>
         box-shadow: 0 -2px 16px var(--glow), 0 0 28px var(--glow);
     }}
     .card:hover {{
-        transform: translateY(-6px);
+        transform: translateY(-4px);
         border-color: var(--glow);
         box-shadow:
             0 18px 38px rgba(0, 0, 0, 0.72),
@@ -477,9 +497,9 @@ portal_html = f"""<!DOCTYPE html>
             inset 0 1px 2px rgba(255, 255, 255, 0.38);
     }}
     .card-media {{
-        flex: 0 0 156px;
-        width: 156px;
-        height: 152px;
+        flex: 0 0 142px;
+        width: 142px;
+        height: 140px;
         border-radius: 14px;
         overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.2);
@@ -498,24 +518,24 @@ portal_html = f"""<!DOCTYPE html>
         z-index: 1;
     }}
     .card-title {{
-        font-size: 1.32rem;
+        font-size: 1.24rem;
         font-weight: 700;
         line-height: 1.18;
         color: #ffffff;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         text-shadow: 0 2px 8px rgba(0, 0, 0, 0.65);
     }}
     .card-desc {{
-        font-size: 0.92rem;
+        font-size: 0.88rem;
         font-weight: 400;
-        line-height: 1.32;
+        line-height: 1.28;
         color: #dbeafe;
         text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
     }}
     .card-arrow {{
-        flex: 0 0 36px;
-        width: 36px;
-        height: 36px;
+        flex: 0 0 34px;
+        width: 34px;
+        height: 34px;
         border-radius: 50%;
         border: 2px solid var(--glow);
         display: flex;
@@ -537,23 +557,23 @@ portal_html = f"""<!DOCTYPE html>
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 11px 36px;
+        padding: 9px 32px;
         background: rgba(3, 14, 30, 0.82);
         border-top: 1px solid rgba(186, 230, 253, 0.22);
         backdrop-filter: blur(12px);
-        font-size: 0.9rem;
+        font-size: 0.86rem;
         color: #e2e8f0;
     }}
     .bottom-left {{
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 11px;
     }}
     .bars {{
         display: flex;
         align-items: flex-end;
         gap: 3px;
-        height: 15px;
+        height: 14px;
     }}
     .bars span {{
         width: 3.5px;
@@ -563,12 +583,12 @@ portal_html = f"""<!DOCTYPE html>
     .bottom-right {{
         display: flex;
         align-items: center;
-        gap: 18px;
+        gap: 16px;
     }}
     .bottom-action {{
         display: flex;
         align-items: center;
-        gap: 7px;
+        gap: 6px;
         cursor: pointer;
         opacity: 0.92;
     }}
@@ -594,7 +614,7 @@ portal_html = f"""<!DOCTYPE html>
         </div>
         <div class="clock-widget">
             <div class="clock-row">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                     <line x1="16" y1="2" x2="16" y2="6"></line>
                     <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -603,11 +623,11 @@ portal_html = f"""<!DOCTYPE html>
                 <span id="live-date">26 Noviembre 2026</span>
             </div>
             <div class="clock-row">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
-                <span id="live-clock">08:59:00 AM</span>
+                <span id="live-clock">09:01:00 AM</span>
             </div>
         </div>
     </header>
@@ -622,7 +642,7 @@ portal_html = f"""<!DOCTYPE html>
                 <span style="height:5px;"></span>
                 <span style="height:8px;"></span>
                 <span style="height:11px;"></span>
-                <span style="height:15px;"></span>
+                <span style="height:14px;"></span>
             </div>
             <span><strong>MIAA</strong> &nbsp;|&nbsp; Innovación, Tecnología y Agua para Todos</span>
         </div>
@@ -663,10 +683,4 @@ portal_html = f"""<!DOCTYPE html>
 </html>
 """
 
-st.markdown(
-    '<style>.block-container{padding:0 !important;max-width:100% !important;}'
-    'iframe{display:block;border:none;}</style>',
-    unsafe_allow_html=True
-)
-
-components.html(portal_html, height=780, scrolling=False)
+components.html(portal_html, height=650, scrolling=False)
